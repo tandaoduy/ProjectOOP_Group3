@@ -1,0 +1,38 @@
+﻿@{
+    ViewBag.Title = "About";
+}
+<main aria-labelledby="title" class="py-12">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h1 id="title" class="text-4xl font-bold text-gray-800 mb-4">@ViewBag.Title</h1>
+            <h2 class="text-2xl text-indigo-600 mb-6">@ViewBag.Message</h2>
+            
+            <div class="prose max-w-none">
+                <p class="text-gray-700 text-lg leading-relaxed mb-6">
+                    Use this area to provide additional information about your application, company, or project.
+                </p>
+                
+                <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 mb-6">
+                    <p class="text-indigo-800">
+                        <strong>Note:</strong> This is a sample About page. You can customize it with your own content.
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-3">Our Mission</h3>
+                        <p class="text-gray-600">
+                            To provide innovative solutions and exceptional service to our customers.
+                        </p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-3">Our Vision</h3>
+                        <p class="text-gray-600">
+                            To be a leading company in our industry, recognized for excellence and innovation.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

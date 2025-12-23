@@ -1,0 +1,44 @@
+@model IEnumerable<ProjectOOP_Group3.Models.PhieuYeuCau>
+
+@{
+    ViewBag.Title = "Chọn Phiếu Yêu Cầu";
+}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Chọn Phiếu Yêu Cầu để tạo Đơn Đặt Hàng</h1>
+
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã PYC</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày lập</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bộ phận</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lý do</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                @foreach (var item in Model)
+                {
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">@item.MaPYC</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">@(item.NgayLap?.ToString("dd/MM/yyyy") ?? "")</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">@(item.BoPhan?.TenBP ?? "")</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">@(item.LyDo ?? "")</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            @Html.ActionLink("Tạo đơn đặt hàng", "Create", new { maPYC = item.MaPYC }, new { @class = "text-indigo-600 hover:text-indigo-900" })
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        @if (!Model.Any())
+        {
+            <div class="text-center py-12 text-gray-500">
+                Không có phiếu yêu cầu đã duyệt nào để tạo đơn đặt hàng
+            </div>
+        }
+    </div>
+</div>
+
