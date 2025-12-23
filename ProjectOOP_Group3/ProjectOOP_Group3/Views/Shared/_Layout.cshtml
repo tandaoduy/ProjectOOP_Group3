@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
@@ -19,29 +19,50 @@
                         <img src="~/Images/logo.png" alt="Logo" class="h-12 w-auto hover:opacity-80 transition-opacity" />
                     </a>
                 </div>
-                <div class="hidden md:flex space-x-8">
-                    @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" })
-                    <div class="relative group">
-                        <button class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                            Phiếu Yêu Cầu
-                            <svg class="inline-block w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                        <div class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                            <div class="py-1">
-                                @Html.ActionLink("Danh sách", "Index", "PhieuYeuCau", null, new { @class = "block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600" })
-                                @Html.ActionLink("Tạo mới", "Create", "PhieuYeuCau", null, new { @class = "block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600" })
+                <div class="hidden md:flex items-center space-x-8">
+                    @if (Session["HoTen"] != null)
+                    {
+                        @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "text-gray-700 hover:text-amber-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" })
+                        <div class="relative group">
+                            <button class="text-gray-700 hover:text-amber-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                                Phi?u Y�u C?u
+                                <svg class="inline-block w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                <div class="py-1">
+                                    @Html.ActionLink("Danh s�ch", "Index", "PhieuYeuCau", new { area = "User" }, new { @class = "block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600" })
+                                    @Html.ActionLink("T?o m?i", "Create", "PhieuYeuCau", new { area = "User" }, new { @class = "block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600" })
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    @Html.ActionLink("Đơn Đặt Hàng", "Index", "DonDatHang", null, new { @class = "text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" })
-                    @Html.ActionLink("Thống Kê", "Index", "ThongKe", null, new { @class = "text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" })
-                    @Html.ActionLink("Duyệt PYC", "Index", "DuyetPYC", null, new { @class = "text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" })
+                        @Html.ActionLink("�on �?t H�ng", "Index", "DonDatHang", new { area = "User" }, new { @class = "text-gray-700 hover:text-amber-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" })
+                        @Html.ActionLink("Th?ng K�", "Index", "ThongKe", new { area = "User" }, new { @class = "text-gray-700 hover:text-amber-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" })
+                        @Html.ActionLink("Duy?t PYC", "Index", "DuyetPYC", new { area = "Admin" }, new { @class = "text-gray-700 hover:text-amber-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" })
+                        
+                        <!-- User Info -->
+                        <div class="flex items-center space-x-3 border-l border-gray-300 pl-6">
+                            <div class="text-right">
+                                <p class="text-xs text-gray-500">@(Session["ChucVu"] as string)</p>
+                                <p class="text-sm font-semibold text-gray-800">@Session["HoTen"]</p>
+                            </div>
+                            <form action="@Url.Action("Logout", "Account")" method="post" class="inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="text-gray-700 hover:text-amber-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                                    �ang xu?t
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        @Html.ActionLink("�ang nh?p", "Login", "Account", new { area = "" }, new { @class = "text-gray-700 hover:text-amber-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" })
+                    }
                 </div>
                 <!-- Mobile menu button -->
                 <div class="md:hidden">
-                    <button type="button" id="mobile-menu-button" class="text-gray-700 hover:text-indigo-600 focus:outline-none focus:text-indigo-600">
+                    <button type="button" id="mobile-menu-button" class="text-gray-700 hover:text-amber-600 focus:outline-none focus:text-indigo-600">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
@@ -52,12 +73,30 @@
         <!-- Mobile menu -->
         <div id="mobile-menu" class="hidden md:hidden">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
-                @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "block text-gray-700 hover:text-indigo-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium" })
-                @Html.ActionLink("Danh sách PYC", "Index", "PhieuYeuCau", null, new { @class = "block text-gray-700 hover:text-indigo-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium" })
-                @Html.ActionLink("Tạo PYC", "Create", "PhieuYeuCau", null, new { @class = "block text-gray-700 hover:text-indigo-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium" })
-                @Html.ActionLink("Đơn Đặt Hàng", "Index", "DonDatHang", null, new { @class = "block text-gray-700 hover:text-indigo-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium" })
-                @Html.ActionLink("Thống Kê", "Index", "ThongKe", null, new { @class = "block text-gray-700 hover:text-indigo-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium" })
-                @Html.ActionLink("Duyệt PYC", "Index", "DuyetPYC", null, new { @class = "block text-gray-700 hover:text-indigo-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium" })
+                @if (Session["HoTen"] != null)
+                {
+                    @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "block text-gray-700 hover:text-amber-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium" })
+                    @Html.ActionLink("Danh s�ch PYC", "Index", "PhieuYeuCau", new { area = "User" }, new { @class = "block text-gray-700 hover:text-amber-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium" })
+                    @Html.ActionLink("T?o PYC", "Create", "PhieuYeuCau", new { area = "User" }, new { @class = "block text-gray-700 hover:text-amber-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium" })
+                    @Html.ActionLink("�on �?t H�ng", "Index", "DonDatHang", new { area = "User" }, new { @class = "block text-gray-700 hover:text-amber-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium" })
+                    @Html.ActionLink("Th?ng K�", "Index", "ThongKe", new { area = "User" }, new { @class = "block text-gray-700 hover:text-amber-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium" })
+                    @Html.ActionLink("Duy?t PYC", "Index", "DuyetPYC", new { area = "Admin" }, new { @class = "block text-gray-700 hover:text-amber-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium" })
+                    
+                    <div class="px-3 py-2 border-t border-gray-200 mt-2">
+                        <p class="text-xs text-gray-500">@(Session["ChucVu"] as string)</p>
+                        <p class="text-sm font-semibold text-gray-800">@Session["HoTen"]</p>
+                    </div>
+                    <form action="@Url.Action("Logout", "Account")" method="post" class="mt-2">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="w-full text-left block text-gray-700 hover:text-amber-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium">
+                            �ang xu?t
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    @Html.ActionLink("�ang nh?p", "Login", "Account", new { area = "" }, new { @class = "block text-gray-700 hover:text-amber-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium" })
+                }
             </div>
         </div>
     </nav>
@@ -66,15 +105,6 @@
     <main class="flex-grow">
         @RenderBody()
     </main>
-
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white mt-auto">
-        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <p class="text-gray-400">&copy; @DateTime.Now.Year - My ASP.NET Application. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")

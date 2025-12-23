@@ -1,0 +1,189 @@
+@model IEnumerable<ProjectOOP_Group3.Modal.DonDatHang>
+
+@{
+    ViewBag.Title = "Danh sách Đơn Đặt Hàng";
+}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Danh sách Đơn Đặt Hàng</h1>
+        @Html.ActionLink("Tạo mới", "Create", "DonDatHang", new { area = "User" }, new { @class = "bg-amber-500 text-white px-6 py-2 rounded-lg hover:bg-amber-600 transition-colors" })
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã DDH</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã PYC</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nhà cung cấp</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày lập</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày giao dự kiến</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tổng tiền</th>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                @if (Model != null)
+                {
+                    foreach (var item in Model)
+                    {
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">@item.MaDDH</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">@item.MaPYC</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">@(item.NhaCungCap?.TenNCC ?? "")</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">@(item.NgayLap?.ToString("dd/MM/yyyy") ?? "")</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">@(item.NgayGiaoDuKien?.ToString("dd/MM/yyyy") ?? "")</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">@(item.TongTien?.ToString("N0") ?? "0") đ</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
+                            <a href="@Url.Action("Details", "DonDatHang", new { area = "User", id = item.MaDDH })" class="text-amber-600 hover:text-amber-900 inline-flex items-center justify-center" title="Chi tiết">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </a>
+                        </td>
+                    </tr>
+                    }
+                }
+            </tbody>
+        </table>
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-center py-12 text-gray-500">
+                Không có dữ liệu
+            </div>
+        }
+    </div>
+    
+    <!-- Phân trang -->
+    @if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+    {
+        <div class="mt-6 flex flex-col items-center space-y-3">
+            <div class="flex justify-center items-center space-x-2">
+                @* First Page *@
+                @if (ViewBag.CurrentPage > 1)
+                {
+                    <a href="@Url.Action("Index", "DonDatHang", new { area = "User", page = 1 })" 
+                       class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                        </svg>
+                    </a>
+                }
+                else
+                {
+                    <span class="w-10 h-10 flex items-center justify-center bg-gray-100 border border-gray-300 rounded-full text-gray-400 cursor-not-allowed">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                        </svg>
+                    </span>
+                }
+                
+                @* Previous Page *@
+                @if (ViewBag.CurrentPage > 1)
+                {
+                    <a href="@Url.Action("Index", "DonDatHang", new { area = "User", page = ViewBag.CurrentPage - 1 })" 
+                       class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </a>
+                }
+                else
+                {
+                    <span class="w-10 h-10 flex items-center justify-center bg-gray-100 border border-gray-300 rounded-full text-gray-400 cursor-not-allowed">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </span>
+                }
+                
+                @* Page Numbers *@
+                @{
+                    int currentPage = ViewBag.CurrentPage;
+                    int totalPages = ViewBag.TotalPages;
+                    int startPage = Math.Max(1, currentPage - 2);
+                    int endPage = Math.Min(totalPages, currentPage + 2);
+                    
+                    if (startPage > 1)
+                    {
+                        <a href="@Url.Action("Index", "DonDatHang", new { area = "User", page = 1 })" 
+                           class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors">
+                            1
+                        </a>
+                        if (startPage > 2)
+                        {
+                            <span class="text-gray-500">...</span>
+                        }
+                    }
+                    
+                    for (int i = startPage; i <= endPage; i++)
+                    {
+                        if (i == currentPage)
+                        {
+                            <span class="w-10 h-10 flex items-center justify-center bg-amber-500 text-white rounded-full font-semibold">@i</span>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Index", "DonDatHang", new { area = "User", page = i })" 
+                               class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors">
+                                @i
+                            </a>
+                        }
+                    }
+                    
+                    if (endPage < totalPages)
+                    {
+                        if (endPage < totalPages - 1)
+                        {
+                            <span class="text-gray-500">...</span>
+                        }
+                        <a href="@Url.Action("Index", "DonDatHang", new { area = "User", page = totalPages })" 
+                           class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors">
+                            @totalPages
+                        </a>
+                    }
+                }
+                
+                @* Next Page *@
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                    <a href="@Url.Action("Index", "DonDatHang", new { area = "User", page = ViewBag.CurrentPage + 1 })" 
+                       class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </a>
+                }
+                else
+                {
+                    <span class="w-10 h-10 flex items-center justify-center bg-gray-100 border border-gray-300 rounded-full text-gray-400 cursor-not-allowed">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </span>
+                }
+                
+                @* Last Page *@
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                    <a href="@Url.Action("Index", "DonDatHang", new { area = "User", page = ViewBag.TotalPages })" 
+                       class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                        </svg>
+                    </a>
+                }
+                else
+                {
+                    <span class="w-10 h-10 flex items-center justify-center bg-gray-100 border border-gray-300 rounded-full text-gray-400 cursor-not-allowed">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                        </svg>
+                    </span>
+                }
+            </div>
+        </div>
+    }
+</div>
+

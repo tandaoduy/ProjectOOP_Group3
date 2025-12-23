@@ -1,0 +1,97 @@
+@model IEnumerable<ProjectOOP_Group3.Modal.PhieuYeuCau>
+
+@{
+    ViewBag.Title = "Duyệt Phiếu Yêu Cầu";
+}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Danh sách Phiếu Yêu Cầu Chờ Duyệt</h1>
+
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã PYC</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày lập</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bộ phận</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lý do</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Người lập</th>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                @if (Model != null)
+                {
+                    foreach (var item in Model)
+                    {
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">@item.MaPYC</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">@(item.NgayLap?.ToString("dd/MM/yyyy") ?? "")</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">@(item.BoPhan?.TenBP ?? "")</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">@(item.LyDo ?? "")</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">@(item.NhanVien?.HoTen ?? "")</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
+                            <div class="flex items-center justify-center gap-3">
+                                <a href="@Url.Action("Details", "DuyetPYC", new { area = "Admin", id = item.MaPYC })" class="text-amber-600 hover:text-amber-900 inline-flex items-center justify-center" title="Xem chi tiết">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </a>
+                                <a href="@Url.Action("Duyet", "DuyetPYC", new { area = "Admin", id = item.MaPYC })" class="text-green-600 hover:text-green-900 inline-flex items-center justify-center" title="Duyệt">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                }
+            </tbody>
+        </table>
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-center py-12 text-gray-500">
+                Không có phiếu yêu cầu nào chờ duyệt
+            </div>
+        }
+    </div>
+    
+    <!-- Phân trang -->
+    @if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+    {
+        <div class="mt-6 flex justify-center items-center space-x-2">
+            @if (ViewBag.CurrentPage > 1)
+            {
+                <a href="@Url.Action("Index", "DuyetPYC", new { area = "Admin", page = ViewBag.CurrentPage - 1 })" 
+                   class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                    Trước
+                </a>
+            }
+            
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                if (i == ViewBag.CurrentPage)
+                {
+                    <span class="px-4 py-2 bg-amber-500 text-white rounded-lg font-semibold">@i</span>
+                }
+                else
+                {
+                    <a href="@Url.Action("Index", "DuyetPYC", new { area = "Admin", page = i })" 
+                       class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        @i
+                    </a>
+                }
+            }
+            
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+            {
+                <a href="@Url.Action("Index", "DuyetPYC", new { area = "Admin", page = ViewBag.CurrentPage + 1 })" 
+                   class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                    Sau
+                </a>
+            }
+        </div>
+    }
+</div>
+

@@ -118,6 +118,9 @@
       <Private>True</Private>
       <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
+    <Reference Include="EPPlus, Version=4.5.3.3, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.4.5.3.3\lib\net40\EPPlus.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform">
@@ -129,8 +132,26 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Areas\Admin\AdminAreaRegistration.cs" />
+    <Compile Include="Areas\Admin\Controllers\AdminBaseController.cs" />
+    <Compile Include="Areas\Admin\Controllers\DuyetPYCController.cs" />
+    <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
+    <Compile Include="Areas\Admin\Controllers\ThongKeController.cs" />
+    <Compile Include="Areas\Admin\Models\ThongKeViewModel.cs" />
+    <Compile Include="Areas\User\Controllers\DonDatHangController.cs" />
+    <Compile Include="Areas\User\Controllers\HomeController.cs" />
+    <Compile Include="Areas\User\Controllers\PhieuYeuCauController.cs" />
+    <Compile Include="Areas\User\Controllers\PhieuYeuCauManualController.cs" />
+    <Compile Include="Areas\User\Controllers\ThongKeController.cs" />
+    <Compile Include="Areas\User\Controllers\TraCuuController.cs" />
+    <Compile Include="Areas\User\Controllers\UserBaseController.cs" />
+    <Compile Include="Areas\User\Models\NhaCungCapInfoViewModel.cs" />
+    <Compile Include="Areas\User\Models\ThongKeViewModel.cs" />
     <Compile Include="Areas\User\UserAreaRegistration.cs" />
+    <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Filters\AuthorizeAreaAttribute.cs" />
+    <Compile Include="Filters\AuthorizeRoleAttribute.cs" />
+    <Compile Include="Helpers\ExcelHelper.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -224,6 +245,31 @@
     <Content Include="Modal\Model_ProjectOOP_Group3.edmx.diagram">
       <DependentUpon>Model_ProjectOOP_Group3.edmx</DependentUpon>
     </Content>
+    <Content Include="Areas\Admin\Views\DuyetPYC\Details.cshtml" />
+    <Content Include="Areas\Admin\Views\DuyetPYC\Duyet.cshtml" />
+    <Content Include="Areas\Admin\Views\DuyetPYC\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\Home\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\ThongKe\Index.cshtml" />
+    <Content Include="Areas\User\Views\DonDatHang\ChonPhieuYeuCau.cshtml" />
+    <Content Include="Areas\User\Views\DonDatHang\Create.cshtml" />
+    <Content Include="Areas\User\Views\DonDatHang\Details.cshtml" />
+    <Content Include="Areas\User\Views\DonDatHang\Index.cshtml" />
+    <Content Include="Areas\User\Views\DonDatHang\Print.cshtml" />
+    <Content Include="Areas\User\Views\Home\Index.cshtml" />
+    <Content Include="Areas\User\Views\PhieuYeuCau\Create.cshtml" />
+    <Content Include="Areas\User\Views\PhieuYeuCau\Details.cshtml" />
+    <Content Include="Areas\User\Views\PhieuYeuCau\Index.cshtml" />
+    <Content Include="Areas\User\Views\PhieuYeuCau\MissingData.cshtml" />
+    <Content Include="Areas\User\Views\PhieuYeuCauManual\Create.cshtml" />
+    <Content Include="Areas\User\Views\ThongKe\Index.cshtml" />
+    <Content Include="Areas\User\Views\TraCuu\ChiTietPYC.cshtml" />
+    <Content Include="Areas\User\Views\TraCuu\DonDatHang.cshtml" />
+    <Content Include="Areas\User\Views\TraCuu\Index.cshtml" />
+    <Content Include="Areas\User\Views\TraCuu\PhieuYeuCau.cshtml" />
+    <Content Include="Areas\Admin\Views\Shared\Error.cshtml" />
+    <Content Include="Areas\Admin\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\User\Views\Shared\Error.cshtml" />
+    <Content Include="Areas\User\Views\Shared\_Layout.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -249,15 +295,12 @@
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Account\Login.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Areas\Admin\Controllers\" />
     <Folder Include="Areas\Admin\Data\" />
-    <Folder Include="Areas\Admin\Views\Shared\" />
-    <Folder Include="Areas\User\Controllers\" />
     <Folder Include="Areas\User\Data\" />
-    <Folder Include="Areas\User\Views\Shared\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />

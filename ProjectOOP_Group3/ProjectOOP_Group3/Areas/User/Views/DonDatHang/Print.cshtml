@@ -1,0 +1,501 @@
+@model ProjectOOP_Group3.Modal.DonDatHang
+
+@{
+    ViewBag.Title = "In Đơn Đặt Hàng";
+    Layout = null;
+    
+    var phieuYeuCau = Model.PhieuYeuCau;
+    var chiTietPYCs = new List<ProjectOOP_Group3.Modal.ChiTietPYC>();
+    
+    // Chỉ lấy các mặt hàng cùng nhà cung cấp với đơn đặt hàng
+    if (phieuYeuCau != null && phieuYeuCau.ChiTietPYCs != null && !String.IsNullOrEmpty(Model.MaNCC))
+    {
+        // Lọc các chi tiết có MaNCC_Gán trùng với nhà cung cấp của đơn đặt hàng
+        chiTietPYCs = phieuYeuCau.ChiTietPYCs
+            .Where(c => c.MaNCC_Gán == Model.MaNCC)
+            .ToList();
+        
+        // Nếu không có chi tiết nào có MaNCC_Gán, thử lấy từ BangGiaNhaCungCap
+        if (chiTietPYCs.Count == 0)
+        {
+            var db = new ProjectOOP_Group3.Modal.ProjectOOP_Nhom3Entities1();
+            var chiTietKhongCoNCC = phieuYeuCau.ChiTietPYCs
+                .Where(c => String.IsNullOrEmpty(c.MaNCC_Gán) && !String.IsNullOrEmpty(c.MaMH))
+                .ToList();
+            
+            foreach (var chiTiet in chiTietKhongCoNCC)
+            {
+                var bangGia = db.BangGiaNhaCungCaps
+                    .Where(b => b.MaMH == chiTiet.MaMH && b.MaNCC == Model.MaNCC)
+                    .OrderByDescending(b => b.NgayCapNhat)
+                    .FirstOrDefault();
+                
+                if (bangGia != null)
+                {
+                    chiTietPYCs.Add(chiTiet);
+                }
+            }
+        }
+    }
+    
+    var tongTien = Model.TongTien ?? 0;
+    var vat = tongTien * 0.1m; // VAT 10%
+    var tongCong = tongTien + vat;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <link rel="icon" type="image/png" href="@Url.Content("~/Images/logo.png")">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 12px;
+            color: #000;
+            background: #fff;
+            padding: 20px;
+        }
+
+        .print-container {
+            max-width: 210mm;
+            margin: 0 auto;
+            background: #fff;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 15px;
+        }
+
+        .logo-section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+            .logo-section img {
+                height: 80px;
+                width: auto;
+                object-fit: contain;
+            }
+
+        .logo-text {
+            flex: 1;
+        }
+
+            .logo-text h1 {
+                font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 5px;
+                color: #000;
+            }
+
+            .logo-text h2 {
+                font-size: 14px;
+                font-weight: normal;
+                color: #666;
+            }
+
+        .title-section {
+            flex: 1;
+            text-align: center;
+        }
+
+            .title-section h1 {
+                font-size: 20px;
+                font-weight: bold;
+                text-transform: uppercase;
+                margin-bottom: 5px;
+            }
+
+            .title-section h2 {
+                font-size: 14px;
+                font-weight: normal;
+            }
+
+        .info-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .buyer-info, .supplier-info {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid #ddd;
+            margin-right: 10px;
+        }
+
+        .supplier-info {
+            margin-right: 0;
+            margin-left: 10px;
+        }
+
+        .info-section h3 {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+
+        .info-section p {
+            margin: 5px 0;
+            font-size: 11px;
+        }
+
+        .order-details {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f5f5f5;
+        }
+
+        .order-detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+            .order-detail-item label {
+                font-weight: bold;
+                font-size: 10px;
+                margin-bottom: 3px;
+            }
+
+            .order-detail-item span {
+                font-size: 12px;
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+            table thead {
+                background: #f0f0f0;
+            }
+
+            table th {
+                border: 1px solid #000;
+                padding: 8px;
+                text-align: center;
+                font-weight: bold;
+                font-size: 11px;
+            }
+
+            table td {
+                border: 1px solid #000;
+                padding: 8px;
+                font-size: 11px;
+            }
+
+                table td:first-child,
+                table th:first-child {
+                    text-align: center;
+                    width: 40px;
+                }
+
+                table td:nth-child(4),
+                table td:nth-child(5),
+                table td:nth-child(6),
+                table td:nth-child(7),
+                table th:nth-child(4),
+                table th:nth-child(5),
+                table th:nth-child(6),
+                table th:nth-child(7) {
+                    text-align: right;
+                }
+
+        .totals {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .totals-table {
+            width: 300px;
+        }
+
+            .totals-table tr td {
+                border: 1px solid #000;
+                padding: 8px;
+                font-size: 11px;
+            }
+
+                .totals-table tr td:first-child {
+                    text-align: left;
+                    font-weight: bold;
+                    width: 60%;
+                }
+
+                .totals-table tr td:last-child {
+                    text-align: right;
+                    width: 40%;
+                }
+
+            .totals-table tr:last-child td {
+                font-weight: bold;
+                font-size: 13px;
+            }
+
+        .terms-section {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+            .terms-section h3 {
+                font-size: 14px;
+                font-weight: bold;
+                margin-bottom: 10px;
+            }
+
+            .terms-section ol {
+                margin-left: 20px;
+                font-size: 11px;
+                line-height: 1.6;
+            }
+
+            .terms-section li {
+                margin-bottom: 5px;
+            }
+
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+
+        .signature-box {
+            width: 300px;
+            text-align: center;
+            border-top: 1px solid #000;
+            padding-top: 10px;
+        }
+
+            .signature-box h4 {
+                font-size: 12px;
+                font-weight: bold;
+                margin-bottom: 50px;
+            }
+
+        @@media print {
+            body {
+                padding: 0;
+            }
+
+            .no-print {
+                display: none !important;
+                visibility: hidden !important;
+            }
+
+            .print-button {
+                display: none !important;
+                visibility: hidden !important;
+            }
+
+            .print-container {
+                max-width: 100%;
+            }
+
+            @@page {
+                size: A4;
+                margin: 1cm;
+            }
+        }
+
+        .print-button {
+            display: block;
+            margin: 30px auto;
+            padding: 12px 30px;
+            background: #F2A900;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+            .print-button:hover {
+                background: #d99a00;
+            }
+    </style>
+</head>
+<body>
+    <div class="print-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo-section">
+                <img src="@Url.Content("~/Images/logo.png")" alt="Logo" />
+                <div class="logo-text">
+                    <h1>Khách sạn Mường Thanh Luxury Khánh Hoà</h1>
+                    <h2>Muong Thanh Luxury Khanh Hoa Hotel</h2>
+                </div>
+            </div>
+            <div class="title-section">
+                <h1>ĐƠN ĐẶT HÀNG</h1>
+                <h2>PURCHASE ORDER</h2>
+            </div>
+        </div>
+
+        <!-- Buyer and Supplier Info -->
+        <div class="info-section">
+            <div class="buyer-info">
+                <h3>BÊN MUA / BUYER</h3>
+                <p><strong>Tên công ty:</strong> Khách sạn Mường Thanh Khánh Hòa - CN Công Ty CP Tập Đoàn Mường Thanh</p>
+                <p><strong>Địa chỉ:</strong> Khu 1 - Khu dân cư Côn Tân Lập, Phương Nha Trang, Tỉnh Khánh Hòa, Việt Nam</p>
+                <p><strong>Điện thoại / Fax:</strong> +84 258 354 6000 / +84 258 354 6666</p>
+                <p><strong>Mã số thuế:</strong> 5600128057-034</p>
+            </div>
+            <div class="supplier-info">
+                <h3>NHÀ CUNG CẤP / SUPPLIER</h3>
+                <p><strong>Tên công ty:</strong> @(Model.NhaCungCap?.TenNCC ?? "")</p>
+                <p><strong>Địa chỉ:</strong> @(Model.NhaCungCap?.DiaChi ?? "")</p>
+                <p><strong>Điện thoại:</strong> @(Model.NhaCungCap?.SoDT ?? "")</p>
+                <p><strong>Fax:</strong></p>
+            </div>
+        </div>
+
+        <!-- Order Details -->
+        <div class="order-details">
+            <div class="order-detail-item">
+                <label>PO No.:</label>
+                <span>@Model.MaDDH</span>
+            </div>
+            <div class="order-detail-item">
+                <label>PR No.:</label>
+                <span>@Model.MaPYC</span>
+            </div>
+            <div class="order-detail-item">
+                <label>Order Date:</label>
+                <span>@(Model.NgayLap?.ToString("MMM dd, yyyy", new System.Globalization.CultureInfo("en-US")) ?? "")</span>
+            </div>
+            <div class="order-detail-item">
+                <label>Delivery date:</label>
+                <span>@(Model.NgayGiaoDuKien?.ToString("MMM dd, yyyy", new System.Globalization.CultureInfo("en-US")) ?? "")</span>
+            </div>
+            <div class="order-detail-item" style="grid-column: span 2;">
+                <label>Department:</label>
+                <span>@(phieuYeuCau?.BoPhan?.TenBP ?? "")</span>
+            </div>
+        </div>
+
+        <!-- Items Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Mã hàng<br/>Item No</th>
+                    <th>Chi tiết hàng hóa<br/>Description & Specification</th>
+                    <th>DVT<br/>Unit</th>
+                    <th>Số lượng<br/>Qty</th>
+                    <th>Đơn giá<br/>Unit cost</th>
+                    <th>Thành tiền<br/>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int stt = 1;
+                }
+                @foreach (var chiTiet in chiTietPYCs)
+                {
+                    var thanhTien = (chiTiet.DonGiaDuKien ?? 0) * chiTiet.SoLuong;
+                    <tr>
+                        <td>@stt</td>
+                        <td>@chiTiet.MaMH</td>
+                        <td>@(chiTiet.MatHang?.TenMH ?? "")</td>
+                        <td>@(chiTiet.MatHang?.DonViTinh ?? "")</td>
+                        <td>@chiTiet.SoLuong.ToString("N2")</td>
+                        <td>@((chiTiet.DonGiaDuKien ?? 0).ToString("N0"))</td>
+                        <td>@thanhTien.ToString("N0")</td>
+                    </tr>
+                    stt++;
+                }
+            </tbody>
+        </table>
+
+        <!-- Totals -->
+        <div class="totals">
+            <table class="totals-table">
+                <tr>
+                    <td>SUB TOTAL</td>
+                    <td>@tongTien.ToString("N0")</td>
+                </tr>
+                <tr>
+                    <td>VAT (10%)</td>
+                    <td>@vat.ToString("N0")</td>
+                </tr>
+                <tr>
+                    <td>TOTAL</td>
+                    <td>@tongCong.ToString("N0")</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Remark -->
+        <div style="margin-bottom: 20px;">
+            <strong>Remark:</strong>
+        </div>
+
+        <!-- Terms & Conditions -->
+        <div class="terms-section">
+            <h3>ĐIỀU KHOẢN & ĐIỀU KIỆN / TERMS & CONDITIONS</h3>
+            <ol>
+                <li>Hàng hóa phải được giao kèm hóa đơn và phiếu giao hàng theo tiêu chuẩn của khách sạn.</li>
+                <li>Mọi thay đổi đơn hàng phải có đơn hàng mới hoặc bổ sung với đầy đủ chữ ký.</li>
+                <li>Khách sạn sẽ không chấp nhận thanh toán cho hàng hóa vượt quá số lượng hoặc giá vượt quá giá đã duyệt.</li>
+                <li>Khách sạn có quyền trả lại hàng hóa nếu chất lượng kém hoặc không đúng quy cách.</li>
+                <li>Khách sạn chỉ chấp nhận thanh toán cho các mặt hàng có hóa đơn đầy đủ và 2 bản phiếu giao hàng đã ký.</li>
+                <li>Đơn hàng có thể bị hủy bất cứ lúc nào với thông báo bằng văn bản.</li>
+                <li>Điều khoản thanh toán theo quy định của khách sạn.</li>
+                <li>Mọi sự chậm trễ trong việc giao hàng phải được báo cáo và được khách sạn chấp thuận.</li>
+                <li>Nhà cung cấp được yêu cầu ký, đóng dấu và gửi lại bản Fax hoặc Scan của đơn hàng sau khi nhận được.</li>
+            </ol>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.DieuKhoan))
+        {
+            <div class="terms-section">
+                <h3>ĐIỀU KHOẢN BỔ SUNG:</h3>
+                <p style="font-size: 11px; line-height: 1.6;">@Model.DieuKhoan</p>
+            </div>
+        }
+
+        <!-- Signature -->
+        <div class="signature-section">
+            <div class="signature-box">
+                <h4>XÁC NHẬN CỦA BÊN ĐẶT HÀNG<br/>ORDER CONFIRMATION</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Button -->
+    <button class="print-button no-print" onclick="window.print()">In Đơn Hàng</button>
+
+    <script>
+        // Auto print when page loads (optional)
+        // window.onload = function() {
+        //     window.print();
+        // }
+    </script>
+</body>
+</html>
+

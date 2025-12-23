@@ -1,0 +1,264 @@
+@model IEnumerable<ProjectOOP_Group3.Modal.PhieuYeuCau>
+
+@{
+    ViewBag.Title = "Danh sách Phiếu Yêu Cầu";
+}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Danh sách Phiếu Yêu Cầu</h1>
+        
+        <!-- Dropdown Tạo mới -->
+        <div class="relative inline-block text-left">
+            <button type="button" id="createDropdownBtn" class="inline-flex items-center gap-2 bg-amber-500 text-white px-6 py-2 rounded-lg hover:bg-amber-600 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Tạo mới
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+            
+            <div id="createDropdown" class="hidden absolute right-0 mt-2 w-64 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                <div class="py-1">
+                    <a href="@Url.Action("Create", "PhieuYeuCau", new { area = "User" })" 
+                       class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors border-b border-gray-100">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <div>
+                            <div class="font-medium">Từ sản phẩm có sẵn</div>
+                            <div class="text-xs text-gray-500">Chọn từ danh sách sản phẩm</div>
+                        </div>
+                    </a>
+                    <a href="@Url.Action("Create", "PhieuYeuCauManual", new { area = "User" })" 
+                       class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors">
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        <div>
+                            <div class="font-medium">Nhập tự do</div>
+                            <div class="text-xs text-gray-500">Nhập thông tin mới</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bảng danh sách -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã PYC</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày lập</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bộ phận</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lý do</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                @if (Model != null)
+                {
+                    foreach (var item in Model)
+                    {
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">@item.MaPYC</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">@(item.NgayLap?.ToString("dd/MM/yyyy") ?? "")</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">@(item.BoPhan?.TenBP ?? "")</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">@(item.LyDo ?? "")</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @{
+                                string badgeClass = "px-2 py-1 rounded-full text-xs font-semibold ";
+                                if (item.TrangThai == "Đã duyệt")
+                                {
+                                    badgeClass += "bg-green-100 text-green-800";
+                                }
+                                else if (item.TrangThai == "Từ chối")
+                                {
+                                    badgeClass += "bg-red-100 text-red-800";
+                                }
+                                else
+                                {
+                                    badgeClass += "bg-yellow-100 text-yellow-800";
+                                }
+                            }
+                            <span class="@badgeClass">@(item.TrangThai ?? "")</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
+                            <a href="@Url.Action("Details", "PhieuYeuCau", new { area = "User", id = item.MaPYC })" class="text-amber-600 hover:text-amber-900 inline-flex items-center justify-center" title="Chi tiết">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </a>
+                        </td>
+                    </tr>
+                    }
+                }
+            </tbody>
+        </table>
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-center py-12 text-gray-500">
+                Không có dữ liệu
+            </div>
+        }
+    </div>
+    
+    <!-- Phân trang -->
+    @if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+    {
+        <div class="mt-6 flex flex-col items-center space-y-3">
+            <div class="flex justify-center items-center space-x-2">
+                @* First Page *@
+                @if (ViewBag.CurrentPage > 1)
+                {
+                    <a href="@Url.Action("Index", "PhieuYeuCau", new { area = "User", page = 1 })" 
+                       class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                        </svg>
+                    </a>
+                }
+                else
+                {
+                    <span class="w-10 h-10 flex items-center justify-center bg-gray-100 border border-gray-300 rounded-full text-gray-400 cursor-not-allowed">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                        </svg>
+                    </span>
+                }
+                
+                @* Previous Page *@
+                @if (ViewBag.CurrentPage > 1)
+                {
+                    <a href="@Url.Action("Index", "PhieuYeuCau", new { area = "User", page = ViewBag.CurrentPage - 1 })" 
+                       class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </a>
+                }
+                else
+                {
+                    <span class="w-10 h-10 flex items-center justify-center bg-gray-100 border border-gray-300 rounded-full text-gray-400 cursor-not-allowed">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </span>
+                }
+                
+                @* Page Numbers *@
+                @{
+                    int currentPage = ViewBag.CurrentPage;
+                    int totalPages = ViewBag.TotalPages;
+                    int startPage = Math.Max(1, currentPage - 2);
+                    int endPage = Math.Min(totalPages, currentPage + 2);
+                    
+                    if (startPage > 1)
+                    {
+                        <a href="@Url.Action("Index", "PhieuYeuCau", new { area = "User", page = 1 })" 
+                           class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors">
+                            1
+                        </a>
+                        if (startPage > 2)
+                        {
+                            <span class="text-gray-500">...</span>
+                        }
+                    }
+                    
+                    for (int i = startPage; i <= endPage; i++)
+                    {
+                        if (i == currentPage)
+                        {
+                            <span class="w-10 h-10 flex items-center justify-center bg-amber-500 text-white rounded-full font-semibold">@i</span>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Index", "PhieuYeuCau", new { area = "User", page = i })" 
+                               class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors">
+                                @i
+                            </a>
+                        }
+                    }
+                    
+                    if (endPage < totalPages)
+                    {
+                        if (endPage < totalPages - 1)
+                        {
+                            <span class="text-gray-500">...</span>
+                        }
+                        <a href="@Url.Action("Index", "PhieuYeuCau", new { area = "User", page = totalPages })" 
+                           class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors">
+                            @totalPages
+                        </a>
+                    }
+                }
+                
+                @* Next Page *@
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                    <a href="@Url.Action("Index", "PhieuYeuCau", new { area = "User", page = ViewBag.CurrentPage + 1 })" 
+                       class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </a>
+                }
+                else
+                {
+                    <span class="w-10 h-10 flex items-center justify-center bg-gray-100 border border-gray-300 rounded-full text-gray-400 cursor-not-allowed">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </span>
+                }
+                
+                @* Last Page *@
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                    <a href="@Url.Action("Index", "PhieuYeuCau", new { area = "User", page = ViewBag.TotalPages })" 
+                       class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                        </svg>
+                    </a>
+                }
+                else
+                {
+                    <span class="w-10 h-10 flex items-center justify-center bg-gray-100 border border-gray-300 rounded-full text-gray-400 cursor-not-allowed">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                        </svg>
+                    </span>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<script>
+    // Dropdown toggle
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropdownBtn = document.getElementById('createDropdownBtn');
+        const dropdown = document.getElementById('createDropdown');
+        
+        if (dropdownBtn && dropdown) {
+            dropdownBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!dropdown.contains(e.target) && !dropdownBtn.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+        }
+
+    });
+</script>

@@ -1,0 +1,575 @@
+@model IEnumerable<ProjectOOP_Group3.Modal.PhieuYeuCau>
+
+@{
+    ViewBag.Title = "Tra Cứu Phiếu Yêu Cầu";
+}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Tra Cứu Phiếu Yêu Cầu</h1>
+        @Html.ActionLink("Quay lại", "Index", "TraCuu", new { area = "User" }, new { @class = "text-amber-600 hover:text-amber-800" })
+    </div>
+
+    <!-- Form tra cứu -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        @using (Html.BeginForm("PhieuYeuCau", "TraCuu", new { area = "User" }, FormMethod.Get))
+        {
+            <div class="space-y-4">
+                <!-- Tìm kiếm -->
+                <div class="relative">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Từ khóa tìm kiếm</label>
+                    <input type="text" name="searchString" id="searchString" value="@ViewBag.SearchString" 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" 
+                           placeholder="Mã PYC, Lý do, Bộ phận, Người lập..."
+                           autocomplete="off">
+                    <div id="suggestions-container" class="absolute z-50 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 hidden max-h-48 overflow-y-auto">
+                        <ul id="suggestions-list" class="py-1"></ul>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <!-- Trạng thái -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Trạng thái</label>
+                        @Html.DropDownList("trangThai", (SelectList)ViewBag.TrangThai, new { @class = "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" })
+                    </div>
+
+                    <!-- Bộ phận -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Bộ phận</label>
+                        @Html.DropDownList("maBP", (SelectList)ViewBag.MaBP, "Tất cả", new { @class = "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" })
+                    </div>
+
+                    <!-- Từ ngày -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Từ ngày</label>
+                        @{
+                            var minDate = DateTime.Now.AddYears(-5).ToString("yyyy-MM-dd");
+                            var maxDate = DateTime.Now.AddYears(5).ToString("yyyy-MM-dd");
+                        }
+                        <input type="date" name="tuNgay" value="@ViewBag.TuNgay" 
+                               id="tuNgay"
+                               min="@minDate"
+                               max="@maxDate"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" />
+                        <span class="text-red-500 text-sm mt-1 block validation-error" id="tuNgay-error" style="display:none;"></span>
+                    </div>
+
+                    <!-- Đến ngày -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Đến ngày</label>
+                        <input type="date" name="denNgay" value="@ViewBag.DenNgay" 
+                               id="denNgay"
+                               min="@minDate"
+                               max="@maxDate"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" />
+                        <span class="text-red-500 text-sm mt-1 block validation-error" id="denNgay-error" style="display:none;"></span>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-4">
+                    <button type="submit" class="bg-amber-500 text-white px-6 py-2 rounded-lg hover:bg-amber-600 transition-colors">
+                        <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        Tìm kiếm
+                    </button>
+                    <a href="@Url.Action("PhieuYeuCau", "TraCuu", new { area = "User" })" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        Làm mới
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Kết quả tra cứu -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h2 class="text-lg font-semibold text-gray-800">
+                Kết quả tra cứu: @(Model?.Count() ?? 0) phiếu yêu cầu
+            </h2>
+        </div>
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã PYC</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày lập</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bộ phận</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Người lập</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lý do</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                @if (Model != null)
+                {
+                    foreach (var item in Model)
+                    {
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">@item.MaPYC</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">@(item.NgayLap?.ToString("dd/MM/yyyy") ?? "")</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">@(item.BoPhan?.TenBP ?? "")</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">@(item.NhanVien?.HoTen ?? "")</td>
+                        <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">@(item.LyDo ?? "")</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @{
+                                string badgeClass = "px-2 py-1 rounded-full text-xs font-semibold ";
+                                if (item.TrangThai == "Đã duyệt")
+                                {
+                                    badgeClass += "bg-green-100 text-green-800";
+                                }
+                                else if (item.TrangThai == "Từ chối")
+                                {
+                                    badgeClass += "bg-red-100 text-red-800";
+                                }
+                                else
+                                {
+                                    badgeClass += "bg-yellow-100 text-yellow-800";
+                                }
+                            }
+                            <span class="@badgeClass">@(item.TrangThai ?? "")</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
+                            <a href="@Url.Action("Details", "PhieuYeuCau", new { area = "User", id = item.MaPYC })" class="text-amber-600 hover:text-amber-900 inline-flex items-center justify-center" title="Chi tiết">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </a>
+                        </td>
+                    </tr>
+                    }
+                }
+            </tbody>
+        </table>
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-center py-12 text-gray-500">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="mt-4 text-lg">Không tìm thấy kết quả nào</p>
+                <p class="text-sm text-gray-500 mt-2">Vui lòng thử lại với từ khóa hoặc tiêu chí khác</p>
+            </div>
+        }
+    </div>
+    
+    <!-- Phân trang -->
+    @if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+    {
+        <div class="mt-6 flex flex-col items-center space-y-3">
+            <div class="flex justify-center items-center space-x-2">
+                @* First Page *@
+                @if (ViewBag.CurrentPage > 1)
+                {
+                    <a href="@Url.Action("PhieuYeuCau", "TraCuu", new { area = "User", page = 1, searchString = ViewBag.SearchString, trangThai = ViewBag.TrangThaiSelected, tuNgay = ViewBag.TuNgay, denNgay = ViewBag.DenNgay, maBP = ViewBag.MaBPSelected })" 
+                       class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                        </svg>
+                    </a>
+                }
+                else
+                {
+                    <span class="w-10 h-10 flex items-center justify-center bg-gray-100 border border-gray-300 rounded-full text-gray-400 cursor-not-allowed">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                        </svg>
+                    </span>
+                }
+                
+                @* Previous Page *@
+                @if (ViewBag.CurrentPage > 1)
+                {
+                    <a href="@Url.Action("PhieuYeuCau", "TraCuu", new { area = "User", page = ViewBag.CurrentPage - 1, searchString = ViewBag.SearchString, trangThai = ViewBag.TrangThaiSelected, tuNgay = ViewBag.TuNgay, denNgay = ViewBag.DenNgay, maBP = ViewBag.MaBPSelected })" 
+                       class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </a>
+                }
+                else
+                {
+                    <span class="w-10 h-10 flex items-center justify-center bg-gray-100 border border-gray-300 rounded-full text-gray-400 cursor-not-allowed">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </span>
+                }
+                
+                @* Page Numbers *@
+                @{
+                    int currentPage = ViewBag.CurrentPage;
+                    int totalPages = ViewBag.TotalPages;
+                    int startPage = Math.Max(1, currentPage - 2);
+                    int endPage = Math.Min(totalPages, currentPage + 2);
+                    
+                    if (startPage > 1)
+                    {
+                        <a href="@Url.Action("PhieuYeuCau", "TraCuu", new { area = "User", page = 1, searchString = ViewBag.SearchString, trangThai = ViewBag.TrangThaiSelected, tuNgay = ViewBag.TuNgay, denNgay = ViewBag.DenNgay, maBP = ViewBag.MaBPSelected })" 
+                           class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors">
+                            1
+                        </a>
+                        if (startPage > 2)
+                        {
+                            <span class="text-gray-500">...</span>
+                        }
+                    }
+                    
+                    for (int i = startPage; i <= endPage; i++)
+                    {
+                        if (i == currentPage)
+                        {
+                            <span class="w-10 h-10 flex items-center justify-center bg-amber-500 text-white rounded-full font-semibold">@i</span>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("PhieuYeuCau", "TraCuu", new { area = "User", page = i, searchString = ViewBag.SearchString, trangThai = ViewBag.TrangThaiSelected, tuNgay = ViewBag.TuNgay, denNgay = ViewBag.DenNgay, maBP = ViewBag.MaBPSelected })" 
+                               class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors">
+                                @i
+                            </a>
+                        }
+                    }
+                    
+                    if (endPage < totalPages)
+                    {
+                        if (endPage < totalPages - 1)
+                        {
+                            <span class="text-gray-500">...</span>
+                        }
+                        <a href="@Url.Action("PhieuYeuCau", "TraCuu", new { area = "User", page = totalPages, searchString = ViewBag.SearchString, trangThai = ViewBag.TrangThaiSelected, tuNgay = ViewBag.TuNgay, denNgay = ViewBag.DenNgay, maBP = ViewBag.MaBPSelected })" 
+                           class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors">
+                            @totalPages
+                        </a>
+                    }
+                }
+                
+                @* Next Page *@
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                    <a href="@Url.Action("PhieuYeuCau", "TraCuu", new { area = "User", page = ViewBag.CurrentPage + 1, searchString = ViewBag.SearchString, trangThai = ViewBag.TrangThaiSelected, tuNgay = ViewBag.TuNgay, denNgay = ViewBag.DenNgay, maBP = ViewBag.MaBPSelected })" 
+                       class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </a>
+                }
+                else
+                {
+                    <span class="w-10 h-10 flex items-center justify-center bg-gray-100 border border-gray-300 rounded-full text-gray-400 cursor-not-allowed">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </span>
+                }
+                
+                @* Last Page *@
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                    <a href="@Url.Action("PhieuYeuCau", "TraCuu", new { area = "User", page = ViewBag.TotalPages, searchString = ViewBag.SearchString, trangThai = ViewBag.TrangThaiSelected, tuNgay = ViewBag.TuNgay, denNgay = ViewBag.DenNgay, maBP = ViewBag.MaBPSelected })" 
+                       class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                        </svg>
+                    </a>
+                }
+                else
+                {
+                    <span class="w-10 h-10 flex items-center justify-center bg-gray-100 border border-gray-300 rounded-full text-gray-400 cursor-not-allowed">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                        </svg>
+                    </span>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            // Autocomplete cho tìm kiếm
+            var searchInput = $('#searchString');
+            var suggestionsContainer = $('#suggestions-container');
+            var suggestionsList = $('#suggestions-list');
+            var searchTimeout;
+            
+            searchInput.on('input', function() {
+                var term = $(this).val().trim();
+                
+                // Xóa timeout cũ
+                clearTimeout(searchTimeout);
+                
+                if (term.length < 1) {
+                    suggestionsContainer.hide();
+                    return;
+                }
+                
+                // Đợi 300ms sau khi người dùng ngừng gõ
+                searchTimeout = setTimeout(function() {
+                    $.ajax({
+                        url: '@Url.Action("GetSuggestions", "TraCuu", new { area = "User" })',
+                        type: 'GET',
+                        data: { term: term },
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response && response.suggestions && response.suggestions.length > 0) {
+                                suggestionsList.empty();
+                                
+                                // Hàm highlight các ký tự trùng với từ khóa
+                                function highlightMatch(text, searchTerm) {
+                                    if (!searchTerm || searchTerm.length === 0) {
+                                        return text;
+                                    }
+                                    
+                                    var regex = new RegExp('(' + searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+                                    return text.replace(regex, '<mark class="bg-amber-200 text-amber-900 font-semibold">$1</mark>');
+                                }
+                                
+                                response.suggestions.forEach(function(suggestion) {
+                                    var highlightedText = highlightMatch(suggestion, term);
+                                    var li = $('<li></li>')
+                                        .addClass('px-4 py-2 hover:bg-amber-50 cursor-pointer text-gray-700')
+                                        .html(highlightedText)
+                                        .on('click', function() {
+                                            searchInput.val(suggestion);
+                                            suggestionsContainer.hide();
+                                        });
+                                    suggestionsList.append(li);
+                                });
+                                
+                                suggestionsContainer.show();
+                            } else {
+                                suggestionsContainer.hide();
+                            }
+                        },
+                        error: function() {
+                            suggestionsContainer.hide();
+                        }
+                    });
+                }, 300);
+            });
+            
+            // Ẩn suggestions khi click ra ngoài
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('#searchString, #suggestions-container').length) {
+                    suggestionsContainer.hide();
+                }
+            });
+            
+            // Xử lý phím mũi tên và Enter
+            searchInput.on('keydown', function(e) {
+                var highlighted = suggestionsList.find('.bg-amber-100');
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (highlighted.length === 0) {
+                        suggestionsList.find('li:first').addClass('bg-amber-100');
+                    } else {
+                        highlighted.removeClass('bg-amber-100');
+                        var next = highlighted.next();
+                        if (next.length) {
+                            next.addClass('bg-amber-100');
+                        } else {
+                            suggestionsList.find('li:first').addClass('bg-amber-100');
+                        }
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (highlighted.length === 0) {
+                        suggestionsList.find('li:last').addClass('bg-amber-100');
+                    } else {
+                        highlighted.removeClass('bg-amber-100');
+                        var prev = highlighted.prev();
+                        if (prev.length) {
+                            prev.addClass('bg-amber-100');
+                        } else {
+                            suggestionsList.find('li:last').addClass('bg-amber-100');
+                        }
+                    }
+                } else if (e.key === 'Enter' && highlighted.length > 0) {
+                    e.preventDefault();
+                    searchInput.val(highlighted.text());
+                    suggestionsContainer.hide();
+                } else if (e.key === 'Escape') {
+                    suggestionsContainer.hide();
+                }
+            });
+            
+            // Date validation
+            var tuNgayInput = $('#tuNgay');
+            var denNgayInput = $('#denNgay');
+            var tuNgayError = $('#tuNgay-error');
+            var denNgayError = $('#denNgay-error');
+            
+            // Lấy ngày hiện tại và giới hạn 5 năm
+            var today = new Date();
+            today.setHours(0, 0, 0, 0);
+            var todayStr = today.toISOString().split('T')[0];
+            
+            var minDate = new Date();
+            minDate.setFullYear(minDate.getFullYear() - 5);
+            minDate.setHours(0, 0, 0, 0);
+            var minDateStr = minDate.toISOString().split('T')[0];
+            
+            var maxDate = new Date();
+            maxDate.setFullYear(maxDate.getFullYear() + 5);
+            maxDate.setHours(0, 0, 0, 0);
+            var maxDateStr = maxDate.toISOString().split('T')[0];
+            
+            // Set min và max nếu chưa có
+            if (!tuNgayInput.attr('min') || tuNgayInput.attr('min') === '') {
+                tuNgayInput.attr('min', minDateStr);
+            }
+            if (!tuNgayInput.attr('max') || tuNgayInput.attr('max') === '') {
+                tuNgayInput.attr('max', maxDateStr);
+            }
+            if (!denNgayInput.attr('min') || denNgayInput.attr('min') === '') {
+                denNgayInput.attr('min', minDateStr);
+            }
+            if (!denNgayInput.attr('max') || denNgayInput.attr('max') === '') {
+                denNgayInput.attr('max', maxDateStr);
+            }
+            
+            // Validation khi submit form
+            $('form').on('submit', function(e) {
+                var tuNgay = tuNgayInput.val();
+                var denNgay = denNgayInput.val();
+                var hasError = false;
+                
+                // Validate Từ ngày
+                if (tuNgay) {
+                    var tuNgayDate = new Date(tuNgay);
+                    tuNgayDate.setHours(0, 0, 0, 0);
+                    
+                    if (tuNgayDate < minDate || tuNgayDate > maxDate) {
+                        e.preventDefault();
+                        tuNgayInput.addClass('input-error');
+                        tuNgayError.text('Ngày phải trong khoảng 5 năm trước và 5 năm sau').show();
+                        hasError = true;
+                    } else {
+                        tuNgayInput.removeClass('input-error');
+                        tuNgayError.hide();
+                    }
+                }
+                
+                // Validate Đến ngày
+                if (denNgay) {
+                    var denNgayDate = new Date(denNgay);
+                    denNgayDate.setHours(0, 0, 0, 0);
+                    
+                    if (denNgayDate < minDate || denNgayDate > maxDate) {
+                        e.preventDefault();
+                        denNgayInput.addClass('input-error');
+                        denNgayError.text('Ngày phải trong khoảng 5 năm trước và 5 năm sau').show();
+                        hasError = true;
+                    } else {
+                        denNgayInput.removeClass('input-error');
+                        denNgayError.hide();
+                    }
+                }
+                
+                // Validate: Đến ngày >= Từ ngày
+                if (tuNgay && denNgay) {
+                    if (denNgayDate < tuNgayDate) {
+                        e.preventDefault();
+                        denNgayInput.addClass('input-error');
+                        denNgayError.text('Đến ngày phải lớn hơn hoặc bằng Từ ngày').show();
+                        hasError = true;
+                    }
+                }
+                
+                if (hasError) {
+                    return false;
+                }
+            });
+            
+            // Validation khi thay đổi Từ ngày
+            tuNgayInput.on('change input', function() {
+                var tuNgay = $(this).val();
+                
+                if (tuNgay) {
+                    var tuNgayDate = new Date(tuNgay);
+                    tuNgayDate.setHours(0, 0, 0, 0);
+                    
+                    if (tuNgayDate < minDate || tuNgayDate > maxDate) {
+                        $(this).addClass('input-error');
+                        tuNgayError.text('Ngày phải trong khoảng 5 năm trước và 5 năm sau').show();
+                    } else {
+                        $(this).removeClass('input-error');
+                        tuNgayError.hide();
+                        
+                        // Cập nhật min của Đến ngày
+                        var denNgay = denNgayInput.val();
+                        if (denNgay) {
+                            var denNgayDate = new Date(denNgay);
+                            if (denNgayDate < tuNgayDate) {
+                                denNgayInput.addClass('input-error');
+                                denNgayError.text('Đến ngày phải lớn hơn hoặc bằng Từ ngày').show();
+                            } else {
+                                denNgayInput.removeClass('input-error');
+                                denNgayError.hide();
+                            }
+                        }
+                    }
+                } else {
+                    $(this).removeClass('input-error');
+                    tuNgayError.hide();
+                }
+            });
+            
+            // Validation khi thay đổi Đến ngày
+            denNgayInput.on('change input', function() {
+                var denNgay = $(this).val();
+                
+                if (denNgay) {
+                    var denNgayDate = new Date(denNgay);
+                    denNgayDate.setHours(0, 0, 0, 0);
+                    
+                    if (denNgayDate < minDate || denNgayDate > maxDate) {
+                        $(this).addClass('input-error');
+                        denNgayError.text('Ngày phải trong khoảng 5 năm trước và 5 năm sau').show();
+                    } else {
+                        var tuNgay = tuNgayInput.val();
+                        if (tuNgay) {
+                            var tuNgayDate = new Date(tuNgay);
+                            if (denNgayDate < tuNgayDate) {
+                                $(this).addClass('input-error');
+                                denNgayError.text('Đến ngày phải lớn hơn hoặc bằng Từ ngày').show();
+                            } else {
+                                $(this).removeClass('input-error');
+                                denNgayError.hide();
+                            }
+                        } else {
+                            $(this).removeClass('input-error');
+                            denNgayError.hide();
+                        }
+                    }
+                } else {
+                    $(this).removeClass('input-error');
+                    denNgayError.hide();
+                }
+            });
+        });
+    </script>
+    <style>
+        .input-error {
+            border-color: #ef4444 !important;
+        }
+        .input-error:focus {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+        }
+        #suggestions-container {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        #suggestions-list li:hover {
+            background-color: #fffbeb;
+        }
+        #suggestions-list li.bg-amber-100 {
+            background-color: #fef3c7;
+        }
+    </style>
+}
+

@@ -1,0 +1,307 @@
+@model ProjectOOP_Group3.Modal.PhieuYeuCau
+
+@{
+    ViewBag.Title = "Tạo Phiếu Yêu Cầu";
+}
+
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Tạo Phiếu Yêu Cầu Mua Hàng</h1>
+
+    @using (Html.BeginForm("Create", "PhieuYeuCau", new { area = "User" }, FormMethod.Post, new { @class = "bg-white rounded-lg shadow-md p-6", novalidate = "novalidate" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="space-y-6">
+            <!-- Thông tin chung -->
+            <div class="border-b border-gray-200 pb-4">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Thông tin chung</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Bộ phận yêu cầu *</label>
+                        @Html.DropDownListFor(m => m.MaBP_YeuCau, (SelectList)ViewBag.MaBP_YeuCau, "Chọn bộ phận", new { @class = "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none", data_required = "true" })
+                        @Html.ValidationMessageFor(m => m.MaBP_YeuCau, "", new { @class = "text-red-500 text-sm" })
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Lý do *</label>
+                        @Html.TextAreaFor(m => m.LyDo, new { @class = "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none", rows = "3", data_required = "true", placeholder = "Nhập lý do yêu cầu...", @id = "lyDo" })
+                        <span class="text-red-500 text-sm mt-1 block validation-error" id="lyDo-error" style="display:none;"></span>
+                        @Html.ValidationMessageFor(m => m.LyDo, "", new { @class = "text-red-500 text-sm mt-1 block" })
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chi tiết mặt hàng -->
+            <div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Chi tiết mặt hàng</h2>
+                <div id="chiTietContainer">
+                    <div class="chiTietItem border border-gray-200 rounded-lg p-4 mb-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Mặt hàng *</label>
+                                @Html.DropDownList("MaMH", (SelectList)ViewBag.MaMH, "Chọn mặt hàng", new { @class = "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none", data_required = "true" })
+                                <span class="text-red-500 text-sm mt-1 block validation-error" style="display:none;"></span>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Số lượng *</label>
+                                <input type="number" name="SoLuong" value="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" min="1" data_required="true" />
+                                <span class="text-red-500 text-sm mt-1 block validation-error" style="display:none;"></span>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Nhà cung cấp *</label>
+                                <select name="MaNCC_Gan" class="nccSelect w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" data_required="true">
+                                    <option value="">Chọn NCC</option>
+                                </select>
+                                <span class="text-red-500 text-sm mt-1 block validation-error" style="display:none;"></span>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Đơn giá dự kiến</label>
+                                <div class="relative">
+                                    <input type="number" name="DonGiaDuKien" step="0.01" value="0" readonly class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed" />
+                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium pointer-events-none">VNĐ</span>
+                                </div>
+                                <p class="text-xs text-amber-600 mt-1 flex items-center">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Giá tự động từ nhà cung cấp đã chọn
+                                </p>
+                                <span class="text-red-500 text-sm mt-1 block validation-error" style="display:none;"></span>
+                            </div>
+                        </div>
+                        <div class="flex justify-end mt-3">
+                            <button type="button" class="text-red-600 hover:text-red-800 text-sm font-medium removeItem inline-flex items-center" style="display:none;">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                Xóa mục này
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" id="addChiTiet" class="inline-flex items-center px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Thêm mặt hàng
+                </button>
+            </div>
+
+            <!-- Nút submit -->
+            <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200">
+                @Html.ActionLink("Hủy", "Index", "PhieuYeuCau", new { area = "User" }, new { @class = "px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors" })
+                <button type="submit" class="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors">
+                    Tạo phiếu yêu cầu
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+@section scripts {
+    <style>
+        .input-error {
+            border-color: #ef4444 !important;
+        }
+        .input-error:focus {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+        }
+    </style>
+    <script>
+        $(document).ready(function () {
+            // Xử lý validation khi submit form
+            $('form').on('submit', function(e) {
+                var hasError = false;
+                
+                // Kiểm tra Lý do (textarea riêng, vì dùng id cố định)
+                var $lyDo = $('#lyDo');
+                var $lyDoError = $('#lyDo-error');
+                if ($lyDo.length) {
+                    if (!$lyDo.val() || $lyDo.val().trim() === '') {
+                        $lyDo.addClass('input-error');
+                        $lyDoError.text('Lý do là bắt buộc').show();
+                        hasError = true;
+                    } else {
+                        $lyDo.removeClass('input-error');
+                        $lyDoError.hide();
+                    }
+                }
+                
+                // Kiểm tra tất cả field required (input/select/textarea) dùng data-required
+                $('input[data-required], select[data-required], textarea[data-required]').each(function() {
+                    var $field = $(this);
+                    // Bỏ qua Lý do vì đã xử lý riêng ở trên
+                    if ($field.attr('id') === 'lyDo') {
+                        return; 
+                    }
+
+                    var $errorSpan = $field.siblings('.validation-error');
+                    // Nếu chưa có span báo lỗi, tạo mới ngay dưới field
+                    if ($errorSpan.length === 0) {
+                        $errorSpan = $('<span class="text-red-500 text-sm mt-1 block validation-error" style="display:none;"></span>');
+                        $errorSpan.insertAfter($field);
+                    }
+                    
+                    if (!$field.val() || $field.val().trim() === '') {
+                        $field.addClass('input-error');
+                        // Tùy theo loại field có thể đổi message sau này
+                        $errorSpan.text('Trường này là bắt buộc').show();
+                        hasError = true;
+                    } else {
+                        $field.removeClass('input-error');
+                        $errorSpan.hide();
+                    }
+                });
+                
+                // Kiểm tra số lượng phải > 0
+                $('input[name="SoLuong"]').each(function() {
+                    var $input = $(this);
+                    var $errorSpan = $input.siblings('.validation-error');
+                    var value = parseInt($input.val());
+                    
+                    if (isNaN(value) || value < 1) {
+                        $input.addClass('input-error');
+                        $errorSpan.text('Số lượng phải lớn hơn 0').show();
+                        hasError = true;
+                    } else {
+                        $input.removeClass('input-error');
+                        $errorSpan.hide();
+                    }
+                });
+                
+                // Kiểm tra nhà cung cấp (select MaNCC_Gan) - bắt buộc
+                $('select[name="MaNCC_Gan"]').each(function() {
+                    var $select = $(this);
+                    var $errorSpan = $select.siblings('.validation-error');
+                    
+                    if (!$select.val() || $select.val() === '') {
+                        $select.addClass('input-error');
+                        $errorSpan.text('Nhà cung cấp là bắt buộc').show();
+                        hasError = true;
+                    } else {
+                        $select.removeClass('input-error');
+                        $errorSpan.hide();
+                    }
+                });
+                
+                if (hasError) {
+                    e.preventDefault();
+                    // Scroll đến input đầu tiên có lỗi
+                    var $firstError = $('.input-error').first();
+                    if ($firstError.length) {
+                        $('html, body').animate({
+                            scrollTop: $firstError.offset().top - 100
+                        }, 500);
+                        $firstError.focus();
+                    }
+                    return false;
+                }
+            });
+            
+            // Xóa lỗi khi người dùng nhập
+            $('input, select, textarea').on('input change', function() {
+                $(this).removeClass('input-error');
+                $(this).siblings('.validation-error').hide();
+                // Xóa lỗi Lý do nếu có
+                if ($(this).attr('id') === 'lyDo') {
+                    $('#lyDo-error').hide();
+                }
+            });
+            var chiTietIndex = 1;
+
+            // Hàm lấy danh sách nhà cung cấp theo mặt hàng
+            function loadNhaCungCap(maMH, nccSelect) {
+                if (!maMH) {
+                    nccSelect.html('<option value="">Chọn NCC</option>');
+                    return;
+                }
+
+                $.ajax({
+                    url: '@Url.Action("GetNhaCungCapByMatHang", "PhieuYeuCau", new { area = "User" })',
+                    type: 'GET',
+                    data: { maMH: maMH },
+                    success: function (data) {
+                        nccSelect.html('<option value="">Chọn NCC</option>');
+                        if (data && data.length > 0) {
+                            $.each(data, function (index, item) {
+                                nccSelect.append($('<option></option>').val(item.MaNCC).text(item.TenNCC));
+                            });
+                        } else {
+                            nccSelect.html('<option value="">Không có nhà cung cấp</option>');
+                        }
+                    },
+                    error: function () {
+                        nccSelect.html('<option value="">Lỗi tải dữ liệu</option>');
+                    }
+                });
+            }
+
+            // Khi chọn mặt hàng, lọc nhà cung cấp
+            $(document).on('change', 'select[name="MaMH"]', function () {
+                var maMH = $(this).val();
+                var chiTietItem = $(this).closest('.chiTietItem');
+                var nccSelect = chiTietItem.find('.nccSelect');
+                var donGiaInput = chiTietItem.find('input[name="DonGiaDuKien"]');
+                
+                // Reset nhà cung cấp và đơn giá
+                nccSelect.val('');
+                donGiaInput.val('0');
+                
+                // Load nhà cung cấp theo mặt hàng
+                loadNhaCungCap(maMH, nccSelect);
+            });
+
+            // Khi chọn nhà cung cấp, tự động điền đơn giá
+            $(document).on('change', '.nccSelect', function () {
+                var chiTietItem = $(this).closest('.chiTietItem');
+                var maMH = chiTietItem.find('select[name="MaMH"]').val();
+                var maNCC = $(this).val();
+                var donGiaInput = chiTietItem.find('input[name="DonGiaDuKien"]');
+
+                if (maMH && maNCC) {
+                    $.ajax({
+                        url: '@Url.Action("GetPrice", "PhieuYeuCau", new { area = "User" })',
+                        type: 'GET',
+                        data: { maMH: maMH, maNCC: maNCC },
+                        success: function (data) {
+                            if (data.hasPrice && data.donGia) {
+                                donGiaInput.val(data.donGia);
+                            }
+                        }
+                    });
+                }
+            });
+
+            // Thêm chi tiết mặt hàng mới
+            $('#addChiTiet').click(function () {
+                var newItem = $('.chiTietItem').first().clone();
+                
+                // Reset các giá trị
+                newItem.find('select[name="MaMH"]').val('');
+                newItem.find('.nccSelect').html('<option value="">Chọn NCC</option>');
+                newItem.find('input[type="number"]').val(function() {
+                    var name = $(this).attr('name');
+                    if (name && name.includes('SoLuong')) return '1';
+                    return '0';
+                });
+                
+                // Hiển thị nút xóa
+                newItem.find('.removeItem').show();
+                
+                // Thêm vào container
+                $('#chiTietContainer').append(newItem);
+                chiTietIndex++;
+            });
+
+            // Xóa chi tiết
+            $(document).on('click', '.removeItem', function () {
+                if ($('.chiTietItem').length > 1) {
+                    $(this).closest('.chiTietItem').remove();
+                } else {
+                    alert('Phải có ít nhất một mặt hàng trong phiếu yêu cầu!');
+                }
+            });
+        });
+    </script>
+}

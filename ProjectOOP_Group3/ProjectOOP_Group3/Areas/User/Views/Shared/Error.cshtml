@@ -1,0 +1,16 @@
+@{
+    ViewBag.Title = "Error";
+}
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="text-center">
+        <h1 class="text-6xl font-bold text-amber-600 mb-4">Oops!</h1>
+        <h2 class="text-3xl font-semibold text-gray-800 mb-4">Có lỗi xảy ra</h2>
+        <p class="text-gray-600 mb-8">Xin lỗi, đã có lỗi xảy ra trong quá trình xử lý yêu cầu của bạn.</p>
+        <div class="space-x-4">
+            @Html.ActionLink("Quay lại", "Index", "PhieuYeuCau", new { area = "User" }, new { @class = "inline-block bg-amber-500 text-white px-6 py-3 rounded-lg hover:bg-amber-600 transition-colors" })
+            @Html.ActionLink("Về Trang Chủ", "Index", "Home", new { area = "" }, new { @class = "inline-block bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors" })
+        </div>
+    </div>
+</div>
+

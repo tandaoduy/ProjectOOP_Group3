@@ -1,0 +1,279 @@
+@model ProjectOOP_Group3.Modal.DonDatHang
+@using ProjectOOP_Group3.Areas.User.Models
+
+@{
+    ViewBag.Title = "Tạo Đơn Đặt Hàng";
+    var chiTietPYC = ViewBag.ChiTietPYC as IEnumerable<ProjectOOP_Group3.Modal.ChiTietPYC>;
+    var nhaCungCapList = ViewBag.NhaCungCapList as List<NhaCungCapInfoViewModel>;
+    var soLuongNCC = ViewBag.SoLuongNCC as int? ?? 0;
+}
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Tạo Đơn Đặt Hàng</h1>
+
+    @using (Html.BeginForm("Create", "DonDatHang", new { area = "User" }, FormMethod.Post, new { @class = "bg-white rounded-lg shadow-md p-6" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.MaPYC)
+
+        if (!ViewData.ModelState.IsValid)
+        {
+            <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <p class="text-red-600 text-sm">@error.ErrorMessage</p>
+                }
+            </div>
+        }
+
+        <div class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Mã PYC</label>
+                    <p class="text-lg font-semibold text-gray-800">@(Model?.MaPYC ?? "")</p>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Thông tin nhà cung cấp</label>
+                    @if (nhaCungCapList != null && nhaCungCapList.Any())
+                    {
+                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+                            <div class="flex items-center mb-2">
+                                <svg class="w-5 h-5 text-amber-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <p class="text-sm font-semibold text-amber-800">
+                                    @if (soLuongNCC > 1)
+                                    {
+                                        <text>Hệ thống sẽ tự động tạo <strong>@soLuongNCC đơn đặt hàng</strong>, mỗi đơn cho một nhà cung cấp:</text>
+                                    }
+                                    else
+                                    {
+                                        <text>Hệ thống sẽ tạo 1 đơn đặt hàng cho nhà cung cấp:</text>
+                                    }
+                                </p>
+                            </div>
+                            <div class="space-y-3">
+                                @foreach (var nccInfo in nhaCungCapList)
+                                {
+                                    <div class="bg-white rounded-lg p-3 border border-amber-200">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <p class="font-semibold text-gray-800">@nccInfo.TenNCC</p>
+                                                <p class="text-sm text-gray-500">Mã: @nccInfo.MaNCC</p>
+                                                <p class="text-xs text-gray-500 mt-1">@nccInfo.SoLuongMatHang mặt hàng</p>
+                                            </div>
+                                            <div class="text-right">
+                                                <p class="text-sm font-semibold text-amber-600">@(((decimal)nccInfo.TongTien).ToString("N0")) VNĐ</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        @Html.HiddenFor(m => m.MaNCC, new { @value = "" })
+                    }
+                    else
+                    {
+                        <div class="w-full px-4 py-2 border border-red-300 rounded-lg bg-red-50">
+                            <p class="text-red-600">Không tìm thấy nhà cung cấp trong phiếu yêu cầu</p>
+                        </div>
+                        @Html.HiddenFor(m => m.MaNCC)
+                    }
+                    @Html.ValidationMessageFor(m => m.MaNCC, "", new { @class = "text-red-500 text-sm mt-1 block" })
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Ngày giao dự kiến *</label>
+                    @{
+                        var minDate = DateTime.Now.ToString("yyyy-MM-dd");
+                    }
+                    @{
+                        var maxDate = DateTime.Now.AddYears(5).ToString("yyyy-MM-dd");
+                    }
+                    @Html.TextBoxFor(m => m.NgayGiaoDuKien, "{0:yyyy-MM-dd}", new { 
+                        @type = "date", 
+                        @class = "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none", 
+                        required = "required",
+                        min = minDate,
+                        max = maxDate,
+                        @id = "ngayGiaoDuKien"
+                    })
+                    <span class="text-red-500 text-sm mt-1 block validation-error" id="ngayGiaoDuKien-error" style="display:none;"></span>
+                    @Html.ValidationMessageFor(m => m.NgayGiaoDuKien, "", new { @class = "text-red-500 text-sm mt-1 block" })
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Điều khoản</label>
+                    @Html.TextAreaFor(m => m.DieuKhoan, new { @class = "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none", rows = "3", placeholder = "Nhập điều khoản..." })
+                    @Html.ValidationMessageFor(m => m.DieuKhoan, "", new { @class = "text-red-500 text-sm mt-1 block" })
+                </div>
+            </div>
+
+            <!-- Chi tiết mặt hàng từ PYC -->
+            @if (chiTietPYC != null && chiTietPYC.Any())
+            {
+                <div class="border-t border-gray-200 pt-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Chi tiết mặt hàng</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mã MH</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tên mặt hàng</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Số lượng</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Đơn giá dự kiến</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @foreach (var chiTiet in chiTietPYC)
+                                {
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">@chiTiet.MaMH</td>
+                                        <td class="px-6 py-4 text-sm text-gray-900">@(chiTiet.MatHang?.TenMH ?? "")</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">@chiTiet.SoLuong</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">@(chiTiet.DonGiaDuKien?.ToString("N0") ?? "")</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                                            @((chiTiet.DonGiaDuKien * chiTiet.SoLuong)?.ToString("N0") ?? "")
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+
+            <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200">
+                @Html.ActionLink("Hủy", "Index", "DonDatHang", new { area = "User" }, new { @class = "px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors" })
+                <button type="submit" class="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors">
+                    Tạo đơn đặt hàng
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            var ngayGiaoInput = $('#ngayGiaoDuKien');
+            var errorSpan = $('#ngayGiaoDuKien-error');
+            
+            // Lấy ngày hôm nay
+            var today = new Date();
+            today.setHours(0, 0, 0, 0);
+            var todayStr = today.toISOString().split('T')[0];
+            
+            // Lấy ngày tối đa (5 năm từ hôm nay)
+            var maxDate = new Date();
+            maxDate.setFullYear(maxDate.getFullYear() + 5);
+            maxDate.setHours(0, 0, 0, 0);
+            var maxDateStr = maxDate.toISOString().split('T')[0];
+            
+            // Set min và max date nếu chưa có
+            if (!ngayGiaoInput.attr('min') || ngayGiaoInput.attr('min') === '') {
+                ngayGiaoInput.attr('min', todayStr);
+            }
+            if (!ngayGiaoInput.attr('max') || ngayGiaoInput.attr('max') === '') {
+                ngayGiaoInput.attr('max', maxDateStr);
+            }
+            
+            // Validation khi submit form
+            $('form').on('submit', function(e) {
+                var selectedDate = ngayGiaoInput.val();
+                
+                if (selectedDate) {
+                    // Kiểm tra năm chỉ có 4 số
+                    var year = selectedDate.split('-')[0];
+                    if (year.length !== 4 || isNaN(year) || parseInt(year) < 1000 || parseInt(year) > 9999) {
+                        e.preventDefault();
+                        ngayGiaoInput.addClass('input-error');
+                        errorSpan.text('Năm phải có đúng 4 số').show();
+                        return false;
+                    }
+                    
+                    var date = new Date(selectedDate);
+                    date.setHours(0, 0, 0, 0);
+                    
+                    if (date < today) {
+                        e.preventDefault();
+                        ngayGiaoInput.addClass('input-error');
+                        errorSpan.text('Ngày giao dự kiến không thể là ngày trong quá khứ').show();
+                        return false;
+                    } else if (date > maxDate) {
+                        e.preventDefault();
+                        ngayGiaoInput.addClass('input-error');
+                        errorSpan.text('Ngày giao dự kiến không được vượt quá 5 năm từ ngày hiện tại').show();
+                        return false;
+                    } else {
+                        ngayGiaoInput.removeClass('input-error');
+                        errorSpan.hide();
+                    }
+                }
+            });
+            
+            // Xóa lỗi khi người dùng chọn ngày
+            ngayGiaoInput.on('change input', function() {
+                var selectedDate = $(this).val();
+                
+                if (selectedDate) {
+                    // Kiểm tra năm chỉ có 4 số
+                    var year = selectedDate.split('-')[0];
+                    if (year.length !== 4 || isNaN(year) || parseInt(year) < 1000 || parseInt(year) > 9999) {
+                        $(this).addClass('input-error');
+                        errorSpan.text('Năm phải có đúng 4 số').show();
+                        return;
+                    }
+                    
+                    var date = new Date(selectedDate);
+                    date.setHours(0, 0, 0, 0);
+                    
+                    if (date < today) {
+                        $(this).addClass('input-error');
+                        errorSpan.text('Ngày giao dự kiến không thể là ngày trong quá khứ').show();
+                    } else if (date > maxDate) {
+                        $(this).addClass('input-error');
+                        errorSpan.text('Ngày giao dự kiến không được vượt quá 5 năm từ ngày hiện tại').show();
+                    } else {
+                        $(this).removeClass('input-error');
+                        errorSpan.hide();
+                    }
+                } else {
+                    $(this).removeClass('input-error');
+                    errorSpan.hide();
+                }
+            });
+            
+            // Ngăn chặn nhập năm quá dài bằng cách giới hạn input
+            ngayGiaoInput.on('keydown', function(e) {
+                // Nếu đang nhập vào phần năm và đã có 4 số, ngăn chặn nhập thêm
+                var cursorPos = this.selectionStart;
+                var value = $(this).val();
+                
+                // Kiểm tra nếu đang ở phần năm (vị trí 0-3)
+                if (cursorPos >= 0 && cursorPos <= 4 && value) {
+                    var year = value.split('-')[0];
+                    if (year && year.length >= 4 && e.key.length === 1 && /[0-9]/.test(e.key)) {
+                        // Nếu đã có 4 số và đang nhập số mới, ngăn chặn
+                        if (cursorPos < 4) {
+                            // Cho phép nếu đang thay thế số cũ
+                            return true;
+                        } else {
+                            e.preventDefault();
+                            return false;
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+    <style>
+        .input-error {
+            border-color: #ef4444 !important;
+        }
+        .input-error:focus {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+        }
+    </style>
+}
+

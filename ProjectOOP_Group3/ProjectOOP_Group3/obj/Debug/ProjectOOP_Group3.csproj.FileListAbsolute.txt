@@ -81,3 +81,5 @@ D:\NTU\CNTT\CODE\Object-Oriented-Software-Developement\Project\ProjectOOP_Group3
 D:\NTU\CNTT\CODE\Object-Oriented-Software-Developement\Project\ProjectOOP_Group3\ProjectOOP_Group3\bin\EntityFramework.SqlServer.dll
 D:\NTU\CNTT\CODE\Object-Oriented-Software-Developement\Project\ProjectOOP_Group3\ProjectOOP_Group3\bin\EntityFramework.xml
 D:\NTU\CNTT\CODE\Object-Oriented-Software-Developement\Project\ProjectOOP_Group3\ProjectOOP_Group3\bin\EntityFramework.SqlServer.xml
+D:\NTU\CNTT\CODE\Object-Oriented-Software-Developement\Project\ProjectOOP_Group3\ProjectOOP_Group3\bin\EPPlus.dll
+D:\NTU\CNTT\CODE\Object-Oriented-Software-Developement\Project\ProjectOOP_Group3\ProjectOOP_Group3\bin\EPPlus.xml

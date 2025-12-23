@@ -1,0 +1,522 @@
+@model ProjectOOP_Group3.Modal.PhieuYeuCau
+
+@{
+    ViewBag.Title = "Tạo Phiếu Yêu Cầu (Nhập Tự Do)";
+}
+
+<style>
+    /* Ẩn dấu mũi tên lên xuống trong input number */
+    .no-spinner::-webkit-inner-spin-button,
+    .no-spinner::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    .no-spinner {
+        -moz-appearance: textfield;
+    }
+</style>
+
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Tạo Phiếu Yêu Cầu Mua Hàng</h1>
+    <p class="text-sm text-amber-600 mb-4">
+        <svg class="inline-block w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Bạn có thể nhập tự do tên sản phẩm và nhà cung cấp mới, hệ thống sẽ tự động tạo nếu chưa có.
+    </p>
+
+    @using (Html.BeginForm("Create", "PhieuYeuCauManual", new { area = "User" }, FormMethod.Post, new { @class = "bg-white rounded-lg shadow-md p-6", novalidate = "novalidate" }))
+    {
+        @Html.AntiForgeryToken()
+
+        if (!ViewData.ModelState.IsValid)
+        {
+            <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <p class="text-red-600 text-sm">@error.ErrorMessage</p>
+                }
+            </div>
+        }
+
+        <div class="space-y-6">
+            <!-- Thông tin chung -->
+            <div class="border-b border-gray-200 pb-4">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Thông tin chung</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Bộ phận yêu cầu *</label>
+                        @Html.DropDownListFor(m => m.MaBP_YeuCau, (SelectList)ViewBag.MaBP_YeuCau, "Chọn bộ phận", new { @class = "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none", @id = "maBP_YeuCau" })
+                        <span class="text-red-500 text-sm mt-1 block validation-error" id="maBP_YeuCau-error" style="display:none;">Bộ phận yêu cầu là bắt buộc</span>
+                        @Html.ValidationMessageFor(m => m.MaBP_YeuCau, "", new { @class = "text-red-500 text-sm mt-1 block" })
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Lý do *</label>
+                        @Html.TextAreaFor(m => m.LyDo, new { @class = "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none", rows = "3", placeholder = "Nhập lý do yêu cầu...", @id = "lyDo" })
+                        <span class="text-red-500 text-sm mt-1 block validation-error" id="lyDo-error" style="display:none;">Lý do là bắt buộc</span>
+                        @Html.ValidationMessageFor(m => m.LyDo, "", new { @class = "text-red-500 text-sm mt-1 block" })
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chi tiết mặt hàng -->
+            <div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Chi tiết mặt hàng</h2>
+                <div id="chiTietContainer">
+                    <div class="chiTietItem border border-gray-200 rounded-lg p-4 mb-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tên mặt hàng *</label>
+                                <input type="text" name="TenMH" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" placeholder="Nhập tên mặt hàng" />
+                                <span class="text-red-500 text-sm mt-1 block validation-error" style="display:none;">Tên mặt hàng là bắt buộc</span>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Đơn vị tính</label>
+                                <input type="text" name="DonViTinh" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" value="Cái" placeholder="Cái, kg, lít..." />
+                                <span class="text-red-500 text-sm mt-1 block validation-error" style="display:none;"></span>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Số lượng *</label>
+                                <input type="number" name="SoLuong" value="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" min="1" 
+                                       onkeydown="return (event.key >= '0' && event.key <= '9') || event.key === 'Backspace' || event.key === 'Delete' || event.key === 'ArrowLeft' || event.key === 'ArrowRight' || event.key === 'Tab' || event.key === 'Enter';" />
+                                <span class="text-red-500 text-sm mt-1 block validation-error" style="display:none;">Số lượng phải lớn hơn 0</span>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Nhà cung cấp *</label>
+                                <input type="text" name="TenNCC" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" placeholder="Nhập tên NCC" />
+                                <span class="text-red-500 text-sm mt-1 block validation-error" style="display:none;">Nhà cung cấp là bắt buộc</span>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Đơn giá dự kiến</label>
+                                <div class="relative">
+                                    <input type="number" name="DonGiaDuKien" step="0.01" value="0" min="0" 
+                                           class="no-spinner w-full px-4 py-2 pr-16 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" 
+                                           oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'); if(parseFloat(this.value) < 0) this.value = 0;" />
+                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium pointer-events-none">VNĐ</span>
+                                </div>
+                                <span class="text-red-500 text-sm mt-1 block validation-error" style="display:none;"></span>
+                            </div>
+                        </div>
+                        <!-- Thông tin nhà cung cấp -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-200">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Địa chỉ NCC *</label>
+                                <input type="text" name="DiaChiNCC" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" placeholder="Nhập địa chỉ nhà cung cấp" />
+                                <span class="text-red-500 text-sm mt-1 block validation-error" style="display:none;">Địa chỉ nhà cung cấp là bắt buộc</span>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Số điện thoại NCC *</label>
+                                <input type="text" name="SoDTNCC" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" placeholder="Nhập số điện thoại (tối đa 10 số)" maxlength="10"
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10);" 
+                                       onkeypress="if(this.value.length >= 10 && event.key >= '0' && event.key <= '9') return false; return (event.key >= '0' && event.key <= '9') || event.key === 'Backspace' || event.key === 'Delete' || event.key === 'ArrowLeft' || event.key === 'ArrowRight' || event.key === 'Tab';" 
+                                       onpaste="setTimeout(function() { var input = event.target; input.value = input.value.replace(/[^0-9]/g, '').substring(0, 10); }, 10);" />
+                                <span class="text-red-500 text-sm mt-1 block validation-error" style="display:none;">Số điện thoại là bắt buộc</span>
+                            </div>
+                        </div>
+                        <button type="button" class="mt-3 text-red-600 hover:text-red-800 text-sm font-medium removeItem" style="display:none;">
+                            <svg class="inline-block w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            Xóa mục này
+                        </button>
+                    </div>
+                </div>
+                <button type="button" id="addChiTiet" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Tạo mới
+                </button>
+            </div>
+
+            <!-- Nút submit -->
+            <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200">
+                @Html.ActionLink("Hủy", "Index", "PhieuYeuCau", new { area = "User" }, new { @class = "px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors" })
+                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    Tạo phiếu yêu cầu
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+@section scripts {
+    <style>
+        .input-error {
+            border-color: #ef4444 !important;
+        }
+        .input-error:focus {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+        }
+    </style>
+    <script>
+        $(document).ready(function () {
+            // Xử lý validation khi submit form - chỉ áp dụng cho form tạo phiếu yêu cầu
+            $('form').on('submit', function(e) {
+                // Bỏ qua validation cho form đăng xuất
+                var $form = $(this);
+                if ($form.attr('action') && $form.attr('action').includes('Logout')) {
+                    return true;
+                }
+                var hasError = false;
+                
+                // Kiểm tra Bộ phận yêu cầu (dropdown)
+                var $maBP = $('#maBP_YeuCau');
+                var $maBPError = $('#maBP_YeuCau-error');
+                if (!$maBP.val() || $maBP.val() === '' || $maBP.val() === null) {
+                    $maBP.addClass('input-error');
+                    $maBPError.css('display', 'block').text('Bộ phận yêu cầu là bắt buộc');
+                    hasError = true;
+                } else {
+                    $maBP.removeClass('input-error');
+                    $maBPError.hide();
+                }
+                
+                // Kiểm tra Lý do (textarea)
+                var $lyDo = $('#lyDo');
+                var $lyDoError = $('#lyDo-error');
+                if (!$lyDo.val() || $lyDo.val().trim() === '') {
+                    $lyDo.addClass('input-error');
+                    $lyDoError.css('display', 'block').text('Lý do là bắt buộc');
+                    hasError = true;
+                } else {
+                    $lyDo.removeClass('input-error');
+                    $lyDoError.hide();
+                }
+                
+                // Kiểm tra Tên mặt hàng
+                $('input[name="TenMH"]').each(function() {
+                    var $input = $(this);
+                    var $errorSpan = $input.siblings('.validation-error');
+                    
+                    if (!$input.val() || $input.val().trim() === '') {
+                        $input.addClass('input-error');
+                        $errorSpan.css('display', 'block').text('Tên mặt hàng là bắt buộc');
+                        hasError = true;
+                    } else {
+                        $input.removeClass('input-error');
+                        $errorSpan.hide();
+                    }
+                });
+                
+                // Kiểm tra số lượng phải > 0
+                $('input[name="SoLuong"]').each(function() {
+                    var $input = $(this);
+                    var $errorSpan = $input.siblings('.validation-error');
+                    var value = parseInt($input.val());
+                    
+                    if (isNaN(value) || value < 1) {
+                        $input.addClass('input-error');
+                        $errorSpan.css('display', 'block').text('Số lượng phải lớn hơn 0');
+                        hasError = true;
+                    } else {
+                        $input.removeClass('input-error');
+                        $errorSpan.hide();
+                    }
+                });
+                
+                // Kiểm tra nhà cung cấp (TenNCC) - bắt buộc
+                $('input[name="TenNCC"]').each(function() {
+                    var $input = $(this);
+                    var $errorSpan = $input.siblings('.validation-error');
+                    
+                    if (!$input.val() || $input.val().trim() === '') {
+                        $input.addClass('input-error');
+                        $errorSpan.css('display', 'block').text('Nhà cung cấp là bắt buộc');
+                        hasError = true;
+                    } else {
+                        $input.removeClass('input-error');
+                        $errorSpan.hide();
+                    }
+                });
+                
+                // Kiểm tra địa chỉ NCC - bắt buộc
+                $('input[name="DiaChiNCC"]').each(function() {
+                    var $input = $(this);
+                    var $errorSpan = $input.siblings('.validation-error');
+                    
+                    if (!$input.val() || $input.val().trim() === '') {
+                        $input.addClass('input-error');
+                        $errorSpan.css('display', 'block').text('Địa chỉ nhà cung cấp là bắt buộc');
+                        hasError = true;
+                    } else {
+                        $input.removeClass('input-error');
+                        $errorSpan.hide();
+                    }
+                });
+                
+                // Kiểm tra số điện thoại NCC - bắt buộc, chỉ số và tối đa 10 số
+                $('input[name="SoDTNCC"]').each(function() {
+                    var $input = $(this);
+                    var $errorSpan = $input.siblings('.validation-error');
+                    var value = $input.val();
+                    
+                    if (!value || value.trim() === '') {
+                        $input.addClass('input-error');
+                        $errorSpan.css('display', 'block').text('Số điện thoại là bắt buộc');
+                        hasError = true;
+                    } else {
+                        // Kiểm tra chỉ chứa số
+                        value = value.replace(/[^0-9]/g, '');
+                        if (value !== $input.val()) {
+                            $input.val(value);
+                        }
+                        // Kiểm tra độ dài tối đa 10 số
+                        if (value.length > 10) {
+                            $input.addClass('input-error');
+                            $errorSpan.css('display', 'block').text('Số điện thoại tối đa 10 số');
+                            hasError = true;
+                        } else if (value.length === 0) {
+                            $input.addClass('input-error');
+                            $errorSpan.css('display', 'block').text('Số điện thoại là bắt buộc');
+                            hasError = true;
+                        } else {
+                            $input.removeClass('input-error');
+                            $errorSpan.hide();
+                        }
+                    }
+                });
+                
+                if (hasError) {
+                    e.preventDefault();
+                    // Scroll đến input đầu tiên có lỗi
+                    var $firstError = $('.input-error').first();
+                    if ($firstError.length) {
+                        $('html, body').animate({
+                            scrollTop: $firstError.offset().top - 100
+                        }, 500);
+                        $firstError.focus();
+                    }
+                    return false;
+                }
+            });
+            
+            // Xóa lỗi khi người dùng nhập
+            $('input, select, textarea').on('input change', function() {
+                $(this).removeClass('input-error');
+                $(this).siblings('.validation-error').hide();
+                // Xóa lỗi cho các trường có id riêng
+                if ($(this).attr('id') === 'maBP_YeuCau') {
+                    $('#maBP_YeuCau-error').hide();
+                }
+                if ($(this).attr('id') === 'lyDo') {
+                    $('#lyDo-error').hide();
+                }
+            });
+            
+            // Ngăn chặn nhập ký tự không phải số cho số điện thoại - real-time validation và giới hạn 10 số
+            $(document).on('input', 'input[name="SoDTNCC"]', function() {
+                var $input = $(this);
+                // Chỉ giữ lại số và giới hạn tối đa 10 số
+                var value = $input.val().replace(/[^0-9]/g, '').substring(0, 10);
+                $input.val(value);
+            });
+            
+            // Ngăn chặn nhập ký tự không phải số và giới hạn độ dài cho số điện thoại
+            $(document).on('keypress', 'input[name="SoDTNCC"]', function(e) {
+                var $input = $(this);
+                // Nếu đã đủ 10 số và đang nhập số, ngăn chặn
+                if ($input.val().length >= 10 && e.key >= '0' && e.key <= '9') {
+                    e.preventDefault();
+                    return false;
+                }
+                // Chỉ cho phép số 0-9
+                if (!(e.key >= '0' && e.key <= '9')) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+            
+            // Ngăn chặn paste ký tự lạ cho số điện thoại và giới hạn 10 số
+            $(document).on('paste', 'input[name="SoDTNCC"]', function(e) {
+                var $input = $(this);
+                setTimeout(function() {
+                    // Chỉ giữ lại số và giới hạn tối đa 10 số
+                    var value = $input.val().replace(/[^0-9]/g, '').substring(0, 10);
+                    $input.val(value);
+                }, 10);
+            });
+            
+            // Validation cho số lượng - chỉ kiểm tra khi blur, không làm mất số khi đang nhập
+            $(document).on('blur', 'input[name="SoLuong"]', function() {
+                var $input = $(this);
+                var $errorSpan = $input.siblings('.validation-error');
+                var value = $input.val();
+                
+                // Loại bỏ ký tự không phải số
+                value = value.replace(/[^0-9]/g, '');
+                
+                // Nếu rỗng hoặc < 1, đặt về 1
+                if (value === '' || parseInt(value) < 1) {
+                    value = '1';
+                    $input.val(value);
+                } else {
+                    $input.val(value);
+                }
+                
+                // Xóa lỗi nếu đã hợp lệ
+                $input.removeClass('input-error');
+                $errorSpan.hide();
+            });
+            
+            // Ngăn chặn nhập ký tự không phải số khi gõ (không làm mất số đang nhập)
+            $(document).on('keypress', 'input[name="SoLuong"]', function(e) {
+                // Chỉ cho phép số 0-9, không cho phép dấu trừ, dấu chấm, dấu phẩy
+                if (!(e.key >= '0' && e.key <= '9')) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+            
+            // Xử lý paste - chỉ giữ lại số
+            $(document).on('paste', 'input[name="SoLuong"]', function(e) {
+                var $input = $(this);
+                setTimeout(function() {
+                    var value = $input.val().replace(/[^0-9]/g, '');
+                    if (value === '' || parseInt(value) < 1) {
+                        value = '1';
+                    }
+                    $input.val(value);
+                }, 10);
+            });
+            
+            var chiTietIndex = 1;
+
+            // Thêm chi tiết mặt hàng mới - với validation
+            $('#addChiTiet').click(function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Validate các item hiện tại trước khi thêm mới
+                var hasError = false;
+                var $currentItems = $('.chiTietItem');
+                
+                // Validate từng item hiện tại
+                $currentItems.each(function() {
+                    var $item = $(this);
+                    
+                    // Validate Tên mặt hàng
+                    var $tenMH = $item.find('input[name="TenMH"]');
+                    var $tenMHError = $tenMH.siblings('.validation-error');
+                    if (!$tenMH.val() || $tenMH.val().trim() === '') {
+                        $tenMH.addClass('input-error');
+                        $tenMHError.text('Trường này là bắt buộc').show();
+                        hasError = true;
+                    } else {
+                        $tenMH.removeClass('input-error');
+                        $tenMHError.hide();
+                    }
+                    
+                    // Validate Số lượng
+                    var $soLuong = $item.find('input[name="SoLuong"]');
+                    var $soLuongError = $soLuong.siblings('.validation-error');
+                    var soLuongValue = parseInt($soLuong.val());
+                    if (isNaN(soLuongValue) || soLuongValue < 1) {
+                        $soLuong.addClass('input-error');
+                        $soLuongError.text('Số lượng phải lớn hơn 0').show();
+                        hasError = true;
+                    } else {
+                        $soLuong.removeClass('input-error');
+                        $soLuongError.hide();
+                    }
+                    
+                    // Validate Nhà cung cấp
+                    var $tenNCC = $item.find('input[name="TenNCC"]');
+                    var $tenNCCError = $tenNCC.siblings('.validation-error');
+                    if (!$tenNCC.val() || $tenNCC.val().trim() === '') {
+                        $tenNCC.addClass('input-error');
+                        $tenNCCError.text('Nhà cung cấp là bắt buộc').show();
+                        hasError = true;
+                    } else {
+                        $tenNCC.removeClass('input-error');
+                        $tenNCCError.hide();
+                    }
+                    
+                    // Validate Địa chỉ NCC
+                    var $diaChiNCC = $item.find('input[name="DiaChiNCC"]');
+                    var $diaChiNCCError = $diaChiNCC.siblings('.validation-error');
+                    if (!$diaChiNCC.val() || $diaChiNCC.val().trim() === '') {
+                        $diaChiNCC.addClass('input-error');
+                        $diaChiNCCError.text('Địa chỉ nhà cung cấp là bắt buộc').show();
+                        hasError = true;
+                    } else {
+                        $diaChiNCC.removeClass('input-error');
+                        $diaChiNCCError.hide();
+                    }
+                    
+                    // Validate Số điện thoại NCC
+                    var $soDTNCC = $item.find('input[name="SoDTNCC"]');
+                    var $soDTNCCError = $soDTNCC.siblings('.validation-error');
+                    var soDTValue = $soDTNCC.val();
+                    if (!soDTValue || soDTValue.trim() === '') {
+                        $soDTNCC.addClass('input-error');
+                        $soDTNCCError.text('Số điện thoại là bắt buộc').show();
+                        hasError = true;
+                    } else {
+                        soDTValue = soDTValue.replace(/[^0-9]/g, '');
+                        if (soDTValue.length > 10) {
+                            $soDTNCC.addClass('input-error');
+                            $soDTNCCError.text('Số điện thoại tối đa 10 số').show();
+                            hasError = true;
+                        } else {
+                            $soDTNCC.removeClass('input-error');
+                            $soDTNCCError.hide();
+                        }
+                    }
+                });
+                
+                // Nếu có lỗi, scroll đến lỗi đầu tiên và dừng lại
+                if (hasError) {
+                    var $firstError = $('.input-error').first();
+                    if ($firstError.length) {
+                        $('html, body').animate({
+                            scrollTop: $firstError.offset().top - 100
+                        }, 500);
+                        $firstError.focus();
+                    }
+                    return false;
+                }
+                
+                // Nếu không có lỗi, thêm item mới
+                var newItem = $('.chiTietItem').first().clone();
+                
+                // Reset tất cả giá trị
+                newItem.find('input[type="text"]').each(function() {
+                    var name = $(this).attr('name');
+                    if (name && name.includes('DonViTinh')) {
+                        $(this).val('Cái');
+                    } else {
+                        $(this).val('');
+                    }
+                });
+                
+                newItem.find('input[type="number"]').each(function() {
+                    var name = $(this).attr('name');
+                    if (name && name.includes('SoLuong')) {
+                        $(this).val('1');
+                    } else {
+                        $(this).val('0');
+                    }
+                });
+                
+                // Hiển thị nút xóa
+                newItem.find('.removeItem').show();
+                
+                // Thêm vào container
+                $('#chiTietContainer').append(newItem);
+                chiTietIndex++;
+            });
+
+            // Xóa chi tiết
+            $(document).on('click', '.removeItem', function () {
+                if ($('.chiTietItem').length > 1) {
+                    $(this).closest('.chiTietItem').remove();
+                } else {
+                    alert('Phải có ít nhất một mặt hàng trong phiếu yêu cầu!');
+                }
+            });
+        });
+    </script>
+}

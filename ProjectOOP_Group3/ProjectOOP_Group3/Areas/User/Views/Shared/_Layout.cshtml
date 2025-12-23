@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Nhân viên kế toán</title>
+    <link rel="icon" type="image/png" href="@Url.Content("~/Images/logo.png")">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    
+    <style>
+        /* Menu Item Hover Animation */
+        .menu-item {
+            position: relative;
+        }
+
+        .menu-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .menu-item:hover::after {
+            width: 80%;
+        }
+
+        .menu-item:hover {
+            color: #f59e0b;
+        }
+
+        /* User Dropdown Menu */
+        .user-dropdown.active .user-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-dropdown.active .user-dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .user-dropdown-menu {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center justify-between w-full md:w-auto">
+                    <a href="@Url.Action("Index", "Home", new { area = "User" })" class="flex items-center">
+                        <img src="@Url.Content("~/Images/logo.png")" alt="Logo" class="h-10" />
+                    </a>
+                    <!-- Mobile menu button - cùng hàng với logo, căn phải -->
+                    <button type="button" id="mobile-menu-button" class="md:hidden text-gray-700 hover:text-amber-600 focus:outline-none focus:text-amber-600 ml-auto">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="hidden md:flex items-center justify-center flex-1 gap-6">
+                    <!-- Phiếu Yêu Cầu -->
+                    <a href="@Url.Action("Index", "PhieuYeuCau", new { area = "User" })" class="menu-item text-gray-700 px-4 py-2 rounded-md text-lg font-medium transition-all">
+                        Phiếu Yêu Cầu
+                    </a>
+
+                    <!-- Other Menu Items -->
+                    <a href="@Url.Action("Index", "DonDatHang", new { area = "User" })" class="menu-item text-gray-700 px-4 py-2 rounded-md text-lg font-medium transition-all">
+                        Đơn Đặt Hàng
+                    </a>
+                    <a href="@Url.Action("Index", "TraCuu", new { area = "User" })" class="menu-item text-gray-700 px-4 py-2 rounded-md text-lg font-medium transition-all">
+                        Tra Cứu
+                    </a>
+                    <a href="@Url.Action("Index", "ThongKe", new { area = "User" })" class="menu-item text-gray-700 px-4 py-2 rounded-md text-lg font-medium transition-all">
+                        Thống Kê
+                    </a>
+                </div>
+                    
+                <!-- User Info Dropdown - Far Right -->
+                @if (Session["HoTen"] != null)
+                {
+                    <div class="hidden md:flex items-center ml-auto">
+                        <div class="relative user-dropdown">
+                            <button type="button" class="flex items-center space-x-3 cursor-pointer focus:outline-none">
+                                <div class="text-right">
+                                    <p class="text-lg font-semibold text-gray-800">Xin chào, @Session["HoTen"]</p>
+                                </div>
+                                <div class="bg-amber-100 rounded-full p-2">
+                                    <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                </div>
+                                <svg class="w-4 h-4 text-gray-600 user-dropdown-arrow transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div class="user-dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl z-50">
+                                <div class="py-2">
+                                    <form action="@Url.Action("Logout", "Account", new { area = "" })" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="w-full text-left flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                            </svg>
+                                            Đăng xuất
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                    else
+                    {
+                        @Html.ActionLink("Đăng nhập", "Login", "Account", new { area = "" }, new { @class = "text-gray-700 hover:text-amber-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" })
+                    }
+                </div>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
+                @Html.ActionLink("Phiếu Yêu Cầu", "Index", "PhieuYeuCau", new { area = "User" }, new { @class = "block text-gray-700 hover:text-amber-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium" })
+                @Html.ActionLink("Đơn Đặt Hàng", "Index", "DonDatHang", new { area = "User" }, new { @class = "block text-gray-700 hover:text-amber-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium" })
+                @Html.ActionLink("Tra Cứu", "Index", "TraCuu", new { area = "User" }, new { @class = "block text-gray-700 hover:text-amber-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium" })
+                @Html.ActionLink("Thống Kê", "Index", "ThongKe", new { area = "User" }, new { @class = "block text-gray-700 hover:text-amber-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium" })
+                @if (Session["HoTen"] != null)
+                {
+                    <div class="px-3 py-2 border-t border-gray-200 mt-2">
+                        <p class="text-sm font-semibold text-gray-800">Xin chào, @Session["HoTen"]</p>
+                    </div>
+                    <form action="@Url.Action("Logout", "Account", new { area = "" })" method="post" class="mt-2">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="w-full text-left block text-gray-700 hover:text-amber-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium">
+                            Đăng xuất
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    @Html.ActionLink("Đăng nhập", "Login", "Account", new { area = "" }, new { @class = "block text-gray-700 hover:text-amber-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium" })
+                }
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        @Html.Partial("_Alert")
+        @RenderBody()
+    </main>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // User dropdown menu
+            const userDropdown = document.querySelector('.user-dropdown');
+            const userDropdownBtn = userDropdown?.querySelector('button');
+            const userDropdownMenu = userDropdown?.querySelector('.user-dropdown-menu');
+
+            if (userDropdownBtn && userDropdownMenu) {
+                // Toggle dropdown on button click
+                userDropdownBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('active');
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!userDropdown.contains(e.target)) {
+                        userDropdown.classList.remove('active');
+                    }
+                });
+
+                // Close dropdown when clicking logout button
+                userDropdownMenu.querySelectorAll('button, form').forEach(element => {
+                    element.addEventListener('click', function() {
+                        userDropdown.classList.remove('active');
+                    });
+                });
+            }
+
+            // Mobile menu toggle
+            const mobileMenuBtn = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+        });
+    </script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>
